@@ -1,0 +1,6 @@
+main: org.ctp.coldstorage.ColdStorage
+version: 1.0
+name: ColdStorage
+commands:
+    coldstorage:
+        description: Opens the cold storage
