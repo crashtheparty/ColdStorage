@@ -6,24 +6,25 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.MaterialData;
+import org.ctp.coldstorage.utils.ChatUtilities;
 
 public class ItemSerialization {
-	@SuppressWarnings("deprecation")
+
 	public static String itemToString(ItemStack item) {
 		String itemString = "";
 		if (item.getType() != null) {
-			itemString = itemString + "id@" + item.getTypeId();
+			itemString = itemString + "name@" + item.getType();
 		}
 		itemString = itemString + " amount@" + item.getAmount();
-
-		if (item.getItemMeta().getDisplayName() != null) {
+		if (item.getType().equals(Material.AIR)) return itemString;
+		if (item.getItemMeta().getDisplayName() != null && !item.getItemMeta().getDisplayName().equals("")) {
 			itemString = itemString
-					+ " name@"
+					+ " item_name@"
 					+ item.getItemMeta().getDisplayName().replace(" ", "_")
 							.replace("§", "&");
 		}
@@ -34,7 +35,7 @@ public class ItemSerialization {
 		if (isEnch.size() > 0) {
 			for (Map.Entry<Enchantment, Integer> ench : isEnch.entrySet()) {
 				itemString = itemString + " enchant@"
-						+ ench.getKey().getName() + "@"
+						+ ench.getKey().getKey().getNamespace() + "+" + ench.getKey().getKey().getKey() + "@"
 						+ ench.getValue();
 			}
 		}
@@ -47,11 +48,9 @@ public class ItemSerialization {
 			}
 		}
 
-		if ((item.getType().equals(Material.SKULL_ITEM))
-				&& (item.getData().equals(new MaterialData(item.getType(),
-						(byte) 3)))) {
+		if ((item.getType().equals(Material.PLAYER_HEAD))) {
 			itemString = itemString + " owner@"
-					+ ((SkullMeta) item.getItemMeta()).getOwner();
+					+ ((SkullMeta) item.getItemMeta()).getOwningPlayer();
 		}
 
 		return itemString;
@@ -65,9 +64,8 @@ public class ItemSerialization {
 		String[] serializedItem = itemString.split(" ");
 		for (String itemInfo : serializedItem) {
 			String[] itemAttribute = itemInfo.split("@");
-			if (itemAttribute[0].equals("id")) {
-				is = new ItemStack(Material.getMaterial(Integer.valueOf(
-						itemAttribute[1]).intValue()));
+			if (itemAttribute[0].equals("name")) {
+				is = new ItemStack(Material.getMaterial(itemAttribute[1]));
 				createdItemStack = Boolean.valueOf(true);
 			} else if ((itemAttribute[0].equals("damage"))
 					&& (createdItemStack.booleanValue())) {
@@ -75,7 +73,7 @@ public class ItemSerialization {
 			} else if ((itemAttribute[0].equals("amount"))
 					&& (createdItemStack.booleanValue())) {
 				is.setAmount(Integer.valueOf(itemAttribute[1]).intValue());
-			} else if ((itemAttribute[0].equals("name"))
+			} else if ((itemAttribute[0].equals("item_name"))
 					&& (createdItemStack.booleanValue())) {
 				ItemMeta im = is.getItemMeta();
 				im.setDisplayName(ChatColor.translateAlternateColorCodes('&',
@@ -83,16 +81,22 @@ public class ItemSerialization {
 				is.setItemMeta(im);
 			} else if ((itemAttribute[0].equals("enchant"))
 					&& (createdItemStack.booleanValue())) {
-				if (Enchantment.getByName(itemAttribute[1]) != null) {
+				NamespacedKey key = null;
+				String[] enchString = itemAttribute[1].split("+");
+				if(enchString[0].equalsIgnoreCase("minecraft")) {
+					key = NamespacedKey.minecraft(enchString[1]);
+				}
+				
+				if (Enchantment.getByKey(key) != null) {
 					is.addUnsafeEnchantment(Enchantment
-							.getByName(itemAttribute[1]),
+							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					org.bukkit.Bukkit.getLogger().warning(
-							"[LobbyTools] Wrong enchantment name: "
+					ChatUtilities.sendToConsole(
+							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					org.bukkit.Bukkit.getLogger().warning(
-							"[LobbyTools] Please fix the name in config!");
+					ChatUtilities.sendToConsole(
+							"Please fix the name in config!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))
 					&& (createdItemStack.booleanValue())) {

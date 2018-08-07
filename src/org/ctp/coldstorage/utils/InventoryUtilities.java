@@ -135,7 +135,7 @@ public class InventoryUtilities {
 		itemStack.setItemMeta(itemStackMeta);
 		inv.setItem(4, itemStack);
 		
-		ItemStack fillInventory = new ItemStack(Material.DRAGONS_BREATH);
+		ItemStack fillInventory = new ItemStack(Material.DRAGON_BREATH);
 		ItemMeta fillInventoryMeta = fillInventory.getItemMeta();
 		fillInventoryMeta.setDisplayName(ChatColor.GOLD + "Fill Inventory");
 		fillInventory.setItemMeta(fillInventoryMeta);

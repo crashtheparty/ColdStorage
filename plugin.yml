@@ -1,6 +1,7 @@
 main: org.ctp.coldstorage.ColdStorage
 version: 1.0
 name: ColdStorage
+api-version: 1.13
 commands:
     coldstorage:
         description: Opens the cold storage

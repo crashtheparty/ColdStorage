@@ -147,7 +147,6 @@ public class InventoryClick implements Listener{
 							amount = InventoryUtilities.maxAddToInventory(player, storageItem.getType());
 							if(storage.getAmount() < amount) amount = storage.getAmount();
 							int left = InventoryUtilities.addItems(player, storageItem.getType(), amount);
-							leftOver = player.getInventory().addItem(new ItemStack(storageItem.getType(), amount));
 							if (left > 0) {
 					            amount -= left;
 					        }
