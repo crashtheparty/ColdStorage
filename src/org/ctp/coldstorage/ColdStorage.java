@@ -1,15 +1,25 @@
 package org.ctp.coldstorage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.ctp.coldstorage.commands.ColdStorageOpen;
+import org.ctp.coldstorage.commands.ColdStorageReload;
 import org.ctp.coldstorage.database.SQLite;
 import org.ctp.coldstorage.listeners.InventoryClick;
+import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.alias.Alias;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
 import org.ctp.coldstorage.utils.config.SimpleConfig;
@@ -24,6 +34,7 @@ public class ColdStorage extends JavaPlugin {
 	private static SimpleConfig CONFIG;
 	public SimpleConfigManager manager;
 	private static Economy ECON = null;
+	private List<Alias> commands = new ArrayList<Alias>();
 
 	public static SimpleConfig getDefaultConfig() {
 		return CONFIG;
@@ -40,13 +51,16 @@ public class ColdStorage extends JavaPlugin {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
-		getCommand("coldstorage").setExecutor(new org.ctp.coldstorage.commands.ColdStorage());
-
-		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(new InventoryClick(), this);
 		
 		initiateConfigs();
+		getLogger().info("Config initialized.");
+		getCommand("csopen").setExecutor(new ColdStorageOpen());
+		getCommand("csreload").setExecutor(new ColdStorageReload());
+		
+		setAliases();
+		
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(new InventoryClick(), this);
 
 		db = new SQLite(plugin);
 		db.load();
@@ -63,14 +77,68 @@ public class ColdStorage extends JavaPlugin {
 		CONFIG.addDefault("max_storage_size", Integer.valueOf(2000000));
 		CONFIG.addDefault("price", 1000);
 		CONFIG.addDefault("price_item", ItemSerialization.itemToString(new ItemStack(Material.DIAMOND, 4)));
+		CONFIG.addDefault("aliases", Arrays.asList());
+		CONFIG.addDefault("open_message", "Opening cold storage...");
 		if (hasVault()) {
 			CONFIG.addDefault("vault", true);
 		} else {
 			CONFIG.addDefault("vault", false);
 		}
 		CONFIG.saveConfig();
-		getLogger().info("Config initialized");
 		ConfigUtilities.getFromConfigs(CONFIG);
+	}
+	
+	private void removeAliases() throws IllegalStateException {
+		for(Alias command : commands) {
+			command.unregister();
+		}
+		commands = new ArrayList<Alias>();
+	}
+	
+	private void setAliases() {
+		for(String alias : ConfigUtilities.ALIASES) {
+			try {
+				commands.add(new Alias(alias, getCommand("csopen")));
+			} catch (Exception e) {
+				ChatUtilities.sendToConsole(Level.WARNING, "Command alias " + alias + " couldn't be added.");
+			}
+		}
+	}
+	
+	public void reloadConfigs(CommandSender sender) {
+		List<String> oldAliases = ConfigUtilities.ALIASES;
+		initiateConfigs();
+		List<String> newAliases = ConfigUtilities.ALIASES;
+		boolean newAlias = false;
+		for(int i = 0; i < oldAliases.size(); i++) {
+			if(!oldAliases.get(i).equals(newAliases.get(i))) {
+				newAlias = true;
+			}
+		}
+		if(oldAliases.size() != newAliases.size()) {
+			newAlias = true;
+		}
+		getLogger().info("Config reloaded.");
+		
+		if(sender instanceof Player) {
+			Player player = (Player) sender;
+			ChatUtilities.sendMessage(player, "Config reloaded.");
+		}
+		
+		if(newAlias) {
+			try {
+				removeAliases();
+				setAliases();
+				if(sender instanceof Player) {
+					Player player = (Player) sender;
+					ChatUtilities.sendMessage(player, "Please note that command autocomplete will not work with updated aliases until a reload.");
+				} else {
+					ChatUtilities.sendToConsole(Level.WARNING, "Please note that command autocomplete will not work with updated aliases until a reload.");
+				}
+			} catch(IllegalStateException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 	
 	public boolean hasVault() {

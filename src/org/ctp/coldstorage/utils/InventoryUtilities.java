@@ -15,6 +15,7 @@ import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.database.tables.StorageTable;
 import org.ctp.coldstorage.database.tables.Table;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
+import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public class InventoryUtilities {
 	
@@ -51,7 +52,14 @@ public class InventoryUtilities {
 			ItemStack storageItem = new ItemStack(storage.getMaterial());
 			ItemMeta storageItemMeta = storageItem.getItemMeta();
 			storageItemMeta.setDisplayName(ChatColor.GOLD + "Type: " + ChatColor.DARK_AQUA + "" + storage.getMaterial().name());
-			storageItemMeta.setLore(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
+			List<String> lore = new ArrayList<String>();
+			lore.addAll(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
+					ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
+			if(!storage.getMeta().equals("")) {
+				lore.add(ChatColor.GOLD + "Metadata: ");
+				lore.addAll(Arrays.asList(storage.getMeta().split(" ")));
+			}
+			storageItemMeta.setLore(lore);
 			storageItem.setItemMeta(storageItemMeta);
 			inv.setItem(i, storageItem);
 		}
@@ -87,8 +95,11 @@ public class InventoryUtilities {
 		player.openInventory(inv);
 	}
 	
-	public static void createColdStorage(Player player, Material type) {
-		if(type.getMaxStackSize() > 1) {
+	public static void createColdStorage(Player player, Material type, String meta) {
+		//if(type.getMaxStackSize() > 1) {
+		if(type == null || type.equals(Material.AIR)) {
+			ChatUtilities.sendMessage(player, "Not valid material; please select a different item.");
+		} else {
 			Table table = ColdStorage.getDb().getTable(StorageTable.class);
 			StorageTable storageTable = null;
 			if(table instanceof StorageTable) {
@@ -98,16 +109,17 @@ public class InventoryUtilities {
 			}
 			
 			if(EconUtils.takeMoney(player)) {
-				storageTable.addPlayerStorage(player, type);
+				storageTable.addPlayerStorage(player, type, meta);
 				ChatUtilities.sendMessage(player, "Paid " + EconUtils.stringifyPrice() + " on Cold Storage for " + type.name() + ".");
 				listColdStorage(player);
 			} else {
 				ChatUtilities.sendMessage(player, "Don't have the money for a new cold storage: " + EconUtils.stringifyPrice());
 			}
-		} else {
-			ChatUtilities.sendMessage(player, "Not valid material; please select a different item.");
-			selectColdStorageType(player);
 		}
+//		} else {
+//			ChatUtilities.sendMessage(player, "Not valid material; please select a different item.");
+//			selectColdStorageType(player);
+//		}
 	}
 	
 	public static void openColdStorage(Player player, ItemStack item) {
@@ -131,7 +143,14 @@ public class InventoryUtilities {
 		ItemStack itemStack = new ItemStack(item.getType());
 		ItemMeta itemStackMeta = itemStack.getItemMeta();
 		itemStackMeta.setDisplayName(ChatColor.GOLD + "Take a Stack");
-		itemStackMeta.setLore(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
+		List<String> takeAllLore = new ArrayList<String>();
+		takeAllLore.addAll(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
+				ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
+		if(!storage.getMeta().equals("")) {
+			takeAllLore.add(ChatColor.GOLD + "Metadata: ");
+			takeAllLore.addAll(Arrays.asList(storage.getMeta().split(" ")));
+		}
+		itemStackMeta.setLore(takeAllLore);
 		itemStack.setItemMeta(itemStackMeta);
 		inv.setItem(4, itemStack);
 		
@@ -157,54 +176,67 @@ public class InventoryUtilities {
 		player.openInventory(inv);
 	}
 	
-	public static int maxAddToInventory(Player player, Material type) {
+	public static int maxAddToInventory(Player player, ItemStack item) {
 		int add = 0;
+		
+		Material type = item.getType();
+		
 		Inventory inv = player.getInventory();
 		for(int i = 0; i < 36; i++) {
-			ItemStack item = inv.getItem(i);
-			if(item == null) {
+			ItemStack invItem = inv.getItem(i);
+			if(invItem == null) {
 				add += type.getMaxStackSize();
-			}else if(item.getType().equals(type)) {
-				add += (item.getMaxStackSize() - item.getAmount());
-			}else if(item.getType().equals(Material.AIR)) {
+			}else if(invItem.getType().equals(type)) {
+				if(ItemSerialization.itemToData(item).equals(ItemSerialization.itemToData(invItem))) {
+					add += (type.getMaxStackSize() - invItem.getAmount());
+				}
+			}else if(invItem.getType().equals(Material.AIR)) {
 				add += type.getMaxStackSize();
 			}
 		}
 		return add;
 	}
 	
-	public static int maxRemoveFromInventory(Player player, Material type) {
+	public static int maxRemoveFromInventory(Player player, ItemStack item) {
 		int remove = 0;
+		
+		Material type = item.getType();
+		
 		Inventory inv = player.getInventory();
 		for(int i = 0; i < 36; i++) {
-			ItemStack item = inv.getItem(i);
-			if(item == null) {
+			ItemStack invItem = inv.getItem(i);
+			if(invItem == null) {
 				
-			}else if(item.getType().equals(type)) {
-				remove += item.getAmount();
+			}else if(invItem.getType().equals(type)) {
+				if(ItemSerialization.itemToData(item).equals(ItemSerialization.itemToData(invItem))) {
+					remove += item.getAmount();
+				}
 			}
 		}
 		return remove;
 	}
-	
-	public static int addItems(Player player, Material material, int amount) {
+
+	public static int addItems(Player player, ItemStack itemAdd) {
 		Inventory inv = player.getInventory();
+		int amount = itemAdd.getAmount();
+		Material material = itemAdd.getType();
+		String metadata = ItemSerialization.itemToData(itemAdd);
 		
 		for(int i = 0; i < 36; i++) {
 			int addItem = material.getMaxStackSize();
 			ItemStack item = inv.getItem(i);
 			if(item == null) {
 				if(addItem > amount) addItem = amount;
-				player.getInventory().setItem(i, new ItemStack(material, addItem));
+				player.getInventory().setItem(i, ItemSerialization.dataToItem(material, addItem, metadata));
 				amount -= addItem;
 			}else if(item.getType().equals(material)) {
 				int setItem = item.getAmount();
 				if(addItem > amount + setItem) addItem = amount + setItem;
-				player.getInventory().setItem(i, new ItemStack(material, addItem));
+				player.getInventory().setItem(i, ItemSerialization.dataToItem(material, addItem, metadata));
 				amount = amount - addItem + setItem;
 			}else if(item.getType().equals(Material.AIR)) {
 				if(addItem > amount) addItem = amount;
-				player.getInventory().setItem(i, new ItemStack(material, material.getMaxStackSize()));
+				player.getInventory().setItem(i, ItemSerialization.dataToItem(material, material.getMaxStackSize(), metadata));
 				amount -= addItem;
 			}
 			if(amount <= 0) break;

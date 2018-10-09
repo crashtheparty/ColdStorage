@@ -26,6 +26,7 @@ public class StorageTable extends Table{
 		addColumn("storage_unique", "varchar", "\"\"");
 		addColumn("material", "varchar", "\"\"");
 		addColumn("amount", "int", "0");
+		addColumn("metadata", "varchar", "\"\"");
 		addColumn("created_at", "varchar", "\"\"");
 	}
 	
@@ -42,7 +43,7 @@ public class StorageTable extends Table{
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				storages.add(new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount")));
+				storages.add(new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata")));
 			}
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
@@ -74,7 +75,7 @@ public class StorageTable extends Table{
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"));
+				storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata"));
 			}
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
@@ -160,20 +161,21 @@ public class StorageTable extends Table{
 		return;
 	}
 	
-	public void addPlayerStorage(Player player, Material material) {
+	public void addPlayerStorage(Player player, Material material, String metadata) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
 			conn = getDb().getSQLConnection();
 			LocalDateTime date = LocalDateTime.now();
 			String dateString = date.toString();
-			ps = conn.prepareStatement("INSERT INTO " + this.getName() + " (player, material, amount, storage_unique, created_at) VALUES (?, ?, ?, ?, ?)");
+			ps = conn.prepareStatement("INSERT INTO " + this.getName() + " (player, material, amount, metadata, storage_unique, created_at) VALUES (?, ?, ?, ?, ?, ?)");
 			
 			ps.setString(1, player.getUniqueId().toString());
 			ps.setString(2, material.name());
 			ps.setInt(3, 0);
-			ps.setString(4, UUID.randomUUID().toString());
-			ps.setString(5, dateString);
+			ps.setString(4, metadata);
+			ps.setString(5, UUID.randomUUID().toString());
+			ps.setString(6, dateString);
 			
 			ps.execute();
 		} catch (SQLException ex) {

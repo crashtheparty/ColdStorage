@@ -17,6 +17,7 @@ import org.ctp.coldstorage.utils.InventoryUtilities;
 import org.ctp.coldstorage.utils.Storage;
 import org.ctp.coldstorage.utils.StorageList;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
+import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public class InventoryClick implements Listener{
 	
@@ -64,7 +65,11 @@ public class InventoryClick implements Listener{
 		} else if (openedInv.getName().equals("Select Material for Cold Storage")) {
 			event.setCancelled(true);
 			ItemStack item = event.getCurrentItem();
-			InventoryUtilities.createColdStorage(player, item.getType());
+			if(item == null) {
+				ChatUtilities.sendMessage(player, "Please select a valid item!");
+			}
+			String meta = ItemSerialization.itemToData(item);
+			InventoryUtilities.createColdStorage(player, item.getType(), meta);
 		} else if (openedInv.getName().contains("Cold Storage:")) {
 			event.setCancelled(true);
 			if(!inv.equals(openedInv)){
@@ -83,18 +88,24 @@ public class InventoryClick implements Listener{
 				}
 				if(storageItem != null && item != null) {
 					if(storageItem.getType().equals(item.getType())) {
+						String meta = ItemSerialization.itemToData(item);
 						Storage storage = Storage.getStorage(player, id);
-						ItemStack replace = new ItemStack(Material.AIR);
-						int newAmount = storage.getAmount() + item.getAmount();
-						if(newAmount > ConfigUtilities.MAX_STORAGE_SIZE) {
-							replace = new ItemStack(item.getType(), newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
-							newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
-							ChatUtilities.sendMessage(player, "Item limit reached!");
+						String storageMeta = storage.getMeta();
+						if(meta.equals(storageMeta)) {
+							ItemStack replace = new ItemStack(Material.AIR);
+							int newAmount = storage.getAmount() + item.getAmount();
+							if(newAmount > ConfigUtilities.MAX_STORAGE_SIZE) {
+								replace = new ItemStack(item.getType(), newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
+								newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
+								ChatUtilities.sendMessage(player, "Item limit reached!");
+							}
+							storage.setAmount(newAmount);
+							storage.updateStorage();
+							inv.setItem(event.getSlot(), replace);
+							InventoryUtilities.openColdStorage(player, storageItem);
+						} else {
+							ChatUtilities.sendMessage(player, "Item must have matching metadata!");
 						}
-						storage.setAmount(newAmount);
-						storage.updateStorage();
-						inv.setItem(event.getSlot(), replace);
-						InventoryUtilities.openColdStorage(player, storageItem);
 					} else {
 						ChatUtilities.sendMessage(player, "Not a valid item!");
 					}
@@ -128,25 +139,33 @@ public class InventoryClick implements Listener{
 						}
 						Storage storage = Storage.getStorage(player, id);
 						int amount = storageItem.getMaxStackSize();
+						ItemStack itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
 						HashMap<Integer, ItemStack> leftOver;
 						switch (event.getSlot()){
 						case 4:
-							if(storage.getAmount() < amount) amount = storage.getAmount();
-							leftOver = player.getInventory().addItem(new ItemStack(item.getType(), amount));
+							if(storage.getAmount() < amount) {
+								amount = storage.getAmount();
+								itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
+							}
+							leftOver = player.getInventory().addItem(itemAdd);
 							if (!leftOver.isEmpty()) {
 					            amount -= leftOver.get(0).getAmount();
 					        }
 							storage.setAmount(storage.getAmount() - amount);
 							break;
 						case 12:
-							amount = InventoryUtilities.maxRemoveFromInventory(player, storageItem.getType());
-							player.getInventory().removeItem(new ItemStack(storageItem.getType(), amount));
+							amount = InventoryUtilities.maxRemoveFromInventory(player, itemAdd);
+							itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
+							player.getInventory().removeItem(itemAdd);
 							storage.setAmount(storage.getAmount() + amount);
 							break;
 						case 14:
-							amount = InventoryUtilities.maxAddToInventory(player, storageItem.getType());
-							if(storage.getAmount() < amount) amount = storage.getAmount();
-							int left = InventoryUtilities.addItems(player, storageItem.getType(), amount);
+							amount = InventoryUtilities.maxAddToInventory(player, itemAdd);
+							if(storage.getAmount() < amount) {
+								amount = storage.getAmount();
+							}
+							itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
+							int left = InventoryUtilities.addItems(player, itemAdd);
 							if (left > 0) {
 					            amount -= left;
 					        }

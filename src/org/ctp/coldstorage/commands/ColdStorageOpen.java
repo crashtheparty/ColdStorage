@@ -6,14 +6,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.ctp.coldstorage.utils.ChatUtilities;
 import org.ctp.coldstorage.utils.InventoryUtilities;
+import org.ctp.coldstorage.utils.config.ConfigUtilities;
 
-public class ColdStorage implements CommandExecutor{
+public class ColdStorageOpen implements CommandExecutor{
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
-			ChatUtilities.sendMessage(player, "Opening cold storage");
+			ChatUtilities.sendMessage(player, ConfigUtilities.OPEN_MESSAGE);
 			InventoryUtilities.listColdStorage(player);
 		}
 		return false;

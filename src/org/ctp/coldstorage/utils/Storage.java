@@ -2,22 +2,33 @@ package org.ctp.coldstorage.utils;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.database.tables.StorageTable;
 import org.ctp.coldstorage.database.tables.Table;
+import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public class Storage {
 	
 	private int amount;
 	private Player player;
 	private Material material;
-	private String unique;
+	private String unique, meta;
 	
-	public Storage(Player player, String unique, Material material, int amount) {
+	public Storage(Player player, String unique, ItemStack item, int amount) {
+		setPlayer(player);
+		setUnique(unique);
+		setMaterial(item.getType());
+		setAmount(amount);
+		setMeta(ItemSerialization.itemToData(item));
+	}
+	
+	public Storage(Player player, String unique, Material material, int amount, String meta) {
 		setPlayer(player);
 		setUnique(unique);
 		setMaterial(material);
 		setAmount(amount);
+		setMeta(meta);
 	}
 
 	public int getAmount() {
@@ -72,6 +83,14 @@ public class Storage {
 			return;
 		}
 		storageTable.setPlayerStorage(this);
+	}
+
+	public String getMeta() {
+		return meta;
+	}
+
+	public void setMeta(String meta) {
+		this.meta = meta;
 	}
 
 }

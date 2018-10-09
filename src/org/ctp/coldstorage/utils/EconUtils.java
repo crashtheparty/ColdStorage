@@ -2,6 +2,7 @@ package org.ctp.coldstorage.utils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 
@@ -23,7 +24,9 @@ public class EconUtils {
 			for (int j = 1; j <= 64; j++) {
 				ItemStack rewardItem = new ItemStack(item.getType(), j);
 				rewardItem.setItemMeta(item.getItemMeta());
-				rewardItem.setDurability(item.getDurability());
+				if(rewardItem.getItemMeta() instanceof Damageable && item.getItemMeta() instanceof Damageable) {
+					((Damageable) rewardItem.getItemMeta()).setDamage(((Damageable) item.getItemMeta()).getDamage());
+				}
 				if (player.getInventory().contains(rewardItem)) {
 					reward += j;
 				}

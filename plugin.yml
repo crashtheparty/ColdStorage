@@ -1,7 +1,9 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 1.0
+version: 1.0.1
 name: ColdStorage
 api-version: 1.13
 commands:
-    coldstorage:
+    csopen:
         description: Opens the cold storage
+    csreload:
+        description: Reload the cold storage configs

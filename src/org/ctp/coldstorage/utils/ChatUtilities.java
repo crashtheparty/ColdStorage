@@ -7,6 +7,7 @@ import static org.bukkit.ChatColor.WHITE;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
@@ -16,6 +17,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.ctp.coldstorage.ColdStorage;
 
 public class ChatUtilities {
 	
@@ -33,6 +35,10 @@ public class ChatUtilities {
 		for(Player player : players){
 			player.sendMessage(starter() + message);
 		}
+	}
+	
+	public static void sendToConsole(Level level, String message) {
+		ColdStorage.plugin.getLogger().log(level, message);
 	}
 	
 	private static String starter(){
