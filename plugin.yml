@@ -1,5 +1,5 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 1.0.1
+version: 1.0.2
 name: ColdStorage
 api-version: 1.13
 commands:
@@ -7,3 +7,7 @@ commands:
         description: Opens the cold storage
     csreload:
         description: Reload the cold storage configs
+permissions:
+    coldstorage.reload:
+        description: Allows player to reload the configs
+        default: op

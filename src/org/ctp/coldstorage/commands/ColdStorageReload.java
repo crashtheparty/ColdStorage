@@ -9,7 +9,9 @@ public class ColdStorageReload implements CommandExecutor{
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		ColdStorage.plugin.reloadConfigs(sender);
+		if(sender.hasPermission("coldstorage.reload")) {
+			ColdStorage.plugin.reloadConfigs(sender);
+		}
 		return false;
 	}
 
