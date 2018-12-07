@@ -1,6 +1,7 @@
 package org.ctp.coldstorage.utils;
 
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ctp.coldstorage.ColdStorage;
@@ -10,25 +11,27 @@ import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public class Storage {
 	
-	private int amount;
-	private Player player;
+	private int amount, orderBy;
+	private OfflinePlayer player;
 	private Material material;
 	private String unique, meta;
 	
-	public Storage(Player player, String unique, ItemStack item, int amount) {
+	public Storage(OfflinePlayer player, String unique, ItemStack item, int amount, int order) {
 		setPlayer(player);
 		setUnique(unique);
 		setMaterial(item.getType());
 		setAmount(amount);
 		setMeta(ItemSerialization.itemToData(item));
+		setOrderBy(order);
 	}
 	
-	public Storage(Player player, String unique, Material material, int amount, String meta) {
+	public Storage(OfflinePlayer player, String unique, Material material, int amount, String meta, int order) {
 		setPlayer(player);
 		setUnique(unique);
 		setMaterial(material);
 		setAmount(amount);
 		setMeta(meta);
+		setOrderBy(order);
 	}
 
 	public int getAmount() {
@@ -39,11 +42,11 @@ public class Storage {
 		this.amount = amount;
 	}
 
-	public Player getPlayer() {
+	public OfflinePlayer getPlayer() {
 		return player;
 	}
 
-	public void setPlayer(Player player) {
+	public void setPlayer(OfflinePlayer player) {
 		this.player = player;
 	}
 
@@ -63,7 +66,7 @@ public class Storage {
 		this.unique = unique;
 	}
 	
-	public static Storage getStorage(Player player, String id) {
+	public static Storage getStorage(OfflinePlayer player, String id) {
 		Table table = ColdStorage.getDb().getTable(StorageTable.class);
 		StorageTable storageTable = null;
 		if(table instanceof StorageTable) {
@@ -74,7 +77,7 @@ public class Storage {
 		return storageTable.getStorage(player, id);
 	}
 	
-	public void updateStorage() {
+	public void updateStorage(Player updated) {
 		Table table = ColdStorage.getDb().getTable(StorageTable.class);
 		StorageTable storageTable = null;
 		if(table instanceof StorageTable) {
@@ -82,7 +85,20 @@ public class Storage {
 		} else {
 			return;
 		}
-		storageTable.setPlayerStorage(this);
+		storageTable.setPlayerStorage(this, updated);
+	}
+	
+	public void deleteStorage(Player deleted) {
+		if(deleted.hasPermission("coldstorage.delete")) {
+			Table table = ColdStorage.getDb().getTable(StorageTable.class);
+			StorageTable storageTable = null;
+			if(table instanceof StorageTable) {
+				storageTable = (StorageTable) table;
+			} else {
+				return;
+			}
+			storageTable.deletePlayerStorage(this);
+		}
 	}
 
 	public String getMeta() {
@@ -91,6 +107,14 @@ public class Storage {
 
 	public void setMeta(String meta) {
 		this.meta = meta;
+	}
+
+	public int getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(int orderBy) {
+		this.orderBy = orderBy;
 	}
 
 }

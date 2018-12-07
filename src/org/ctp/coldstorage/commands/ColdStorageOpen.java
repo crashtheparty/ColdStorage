@@ -15,7 +15,7 @@ public class ColdStorageOpen implements CommandExecutor{
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			ChatUtilities.sendMessage(player, ConfigUtilities.OPEN_MESSAGE);
-			InventoryUtilities.listColdStorage(player);
+			InventoryUtilities.addInventory(player);
 		}
 		return false;
 	}

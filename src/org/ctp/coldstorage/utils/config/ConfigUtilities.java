@@ -8,8 +8,8 @@ import org.bukkit.inventory.ItemStack;
 public class ConfigUtilities {
 	
 	public static int MAX_STORAGE_SIZE = 2000000;
-	public static int PRICE = 1000;
-	public static ItemStack PRICE_ITEM;
+	public static int PRICE = 1000, PRICE_REFUND = 250;
+	public static ItemStack PRICE_ITEM, PRICE_ITEM_REFUND;
 	public static boolean VAULT;
 	public static String OPEN_MESSAGE = "Opening cold storage...";
 	public static List<String> ALIASES = new ArrayList<String>();
@@ -38,6 +38,14 @@ public class ConfigUtilities {
 		
 		if(config.contains("price_item")) {
 			PRICE_ITEM = ItemSerialization.stringToItem(config.getString("price_item"));
+		}
+		
+		if(config.contains("price_refund")) {
+			PRICE_REFUND = config.getInt("price_refund");
+		}
+		
+		if(config.contains("price_item_refund")) {
+			PRICE_ITEM_REFUND = ItemSerialization.stringToItem(config.getString("price_item_refund"));
 		}
 		
 		if(config.contains("vault")) {

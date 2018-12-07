@@ -10,7 +10,11 @@ import net.milkbowl.vault.economy.Economy;
 
 public class EconUtils {
 
-	public static boolean takeMoney(Player player) {
+	public static boolean takeMoney(Player player, boolean admin) {
+		if(admin || player.hasPermission("coldstorage.free")) {
+			return true;
+		}
+		
 		if(ConfigUtilities.VAULT){
 			Economy econ = ColdStorage.getEconomy();
 			double price = ConfigUtilities.PRICE;
@@ -40,8 +44,24 @@ public class EconUtils {
 		return false;
 	}
 	
-	public static String stringifyPrice() {
+	public static String stringifyRefund(Player player) {
 		String price = "";
+		if(player.hasPermission("coldstorage.free")) {
+			return "No Refund";
+		}
+		if(ConfigUtilities.VAULT) {
+			price += ColdStorage.getEconomy().format(ConfigUtilities.PRICE_REFUND);
+		} else {
+			price += ConfigUtilities.PRICE_ITEM_REFUND.toString();
+		}
+		return price;
+	}
+	
+	public static String stringifyPrice(Player player) {
+		String price = "";
+		if(player.hasPermission("coldstorage.free")) {
+			return "Free";
+		}
 		if(ConfigUtilities.VAULT) {
 			price += ColdStorage.getEconomy().format(ConfigUtilities.PRICE);
 		} else {

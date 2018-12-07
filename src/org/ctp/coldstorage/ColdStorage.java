@@ -14,10 +14,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.ctp.coldstorage.commands.ColdStorageAdmin;
 import org.ctp.coldstorage.commands.ColdStorageOpen;
 import org.ctp.coldstorage.commands.ColdStorageReload;
 import org.ctp.coldstorage.database.SQLite;
+import org.ctp.coldstorage.listeners.ChatMessage;
 import org.ctp.coldstorage.listeners.InventoryClick;
+import org.ctp.coldstorage.listeners.InventoryClose;
 import org.ctp.coldstorage.utils.ChatUtilities;
 import org.ctp.coldstorage.utils.alias.Alias;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
@@ -54,6 +57,7 @@ public class ColdStorage extends JavaPlugin {
 		
 		initiateConfigs();
 		getLogger().info("Config initialized.");
+		getCommand("csadmin").setExecutor(new ColdStorageAdmin());
 		getCommand("csopen").setExecutor(new ColdStorageOpen());
 		getCommand("csreload").setExecutor(new ColdStorageReload());
 		
@@ -61,6 +65,8 @@ public class ColdStorage extends JavaPlugin {
 		
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new InventoryClick(), this);
+		pm.registerEvents(new InventoryClose(), this);
+		pm.registerEvents(new ChatMessage(), this);
 
 		db = new SQLite(plugin);
 		db.load();
@@ -77,6 +83,8 @@ public class ColdStorage extends JavaPlugin {
 		CONFIG.addDefault("max_storage_size", Integer.valueOf(2000000));
 		CONFIG.addDefault("price", 1000);
 		CONFIG.addDefault("price_item", ItemSerialization.itemToString(new ItemStack(Material.DIAMOND, 4)));
+		CONFIG.addDefault("price_refund", 250);
+		CONFIG.addDefault("price_item_refund", ItemSerialization.itemToString(new ItemStack(Material.DIAMOND, 1)));
 		CONFIG.addDefault("aliases", Arrays.asList());
 		CONFIG.addDefault("open_message", "Opening cold storage...");
 		if (hasVault()) {

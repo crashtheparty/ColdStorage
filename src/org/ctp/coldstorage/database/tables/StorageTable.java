@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.ctp.coldstorage.database.Errors;
 import org.ctp.coldstorage.database.SQLite;
@@ -28,9 +29,13 @@ public class StorageTable extends Table{
 		addColumn("amount", "int", "0");
 		addColumn("metadata", "varchar", "\"\"");
 		addColumn("created_at", "varchar", "\"\"");
+		addColumn("created_by", "varchar", "\"\"");
+		addColumn("updated_at", "varchar", "\"\"");
+		addColumn("modified_by", "varchar", "\"\"");
+		addColumn("order_by", "int", "0");
 	}
 	
-	public List<Storage> getPlayerStorage(Player player){
+	public List<Storage> getPlayerStorage(OfflinePlayer player){
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -39,11 +44,11 @@ public class StorageTable extends Table{
 		try {
 			conn = getDb().getSQLConnection();
 			ps = conn.prepareStatement("SELECT * FROM " + getName()
-					+ " WHERE player = '" + uuid + "' ORDER BY created_at asc;");
+					+ " WHERE player = '" + uuid + "' ORDER BY order_by asc, created_at asc;");
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				storages.add(new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata")));
+				storages.add(new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata"), rs.getInt("order_by")));
 			}
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
@@ -62,7 +67,7 @@ public class StorageTable extends Table{
 		return storages;
 	}
 	
-	public Storage getStorage(Player player, String unique){
+	public Storage getStorage(OfflinePlayer player, String unique){
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -75,7 +80,7 @@ public class StorageTable extends Table{
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata"));
+				storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getInt("amount"), rs.getString("metadata"), rs.getInt("order_by"));
 			}
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
@@ -126,19 +131,24 @@ public class StorageTable extends Table{
 		return found;
 	}
 	
-	public void setPlayerStorage(Storage storage) {
+	public void setPlayerStorage(Storage storage, Player modified) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		boolean hasRecord = hasStorageRecord(storage);
 		if(hasRecord) {
 			try {
+				LocalDateTime date = LocalDateTime.now();
+				String dateString = date.toString();
 				conn = getDb().getSQLConnection();
-				ps = conn.prepareStatement("UPDATE " + this.getName() + " SET amount = ? WHERE player = ? AND storage_unique = ?");
+				ps = conn.prepareStatement("UPDATE " + this.getName() + " SET amount = ?, order_by = ?, modified_by = ?, updated_at = ? WHERE player = ? AND storage_unique = ?");
 	
 				ps.setInt(1, storage.getAmount()); 
+				ps.setInt(2, storage.getOrderBy());  
+				ps.setString(3, storage.getPlayer().getUniqueId().toString()); 
+				ps.setString(4, dateString); 
 	
-				ps.setString(2, storage.getPlayer().getUniqueId().toString());
-				ps.setString(3, storage.getUnique());
+				ps.setString(5, storage.getPlayer().getUniqueId().toString());
+				ps.setString(6, storage.getUnique());
 				ps.executeUpdate();
 			} catch (SQLException ex) {
 				getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
@@ -156,26 +166,71 @@ public class StorageTable extends Table{
 			}
 		} else {
 			getDb().getPlugin().getLogger().log(Level.WARNING, "Missing possible record with storage: " + storage.toString());
-			ChatUtilities.sendMessage(storage.getPlayer(), "Issue with the plugin. Please contact an administrator to get this resolved.");
+			ChatUtilities.sendMessage(modified, "Issue with the plugin. Please contact an administrator to get this resolved.");
 		}
 		return;
 	}
 	
-	public void addPlayerStorage(Player player, Material material, String metadata) {
+	public void addPlayerStorage(Storage storage, Player created) {
+		OfflinePlayer player = storage.getPlayer();
+		Material material = storage.getMaterial();
+		String metadata = storage.getMeta();
+		int order = storage.getOrderBy();
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
 			conn = getDb().getSQLConnection();
 			LocalDateTime date = LocalDateTime.now();
 			String dateString = date.toString();
-			ps = conn.prepareStatement("INSERT INTO " + this.getName() + " (player, material, amount, metadata, storage_unique, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+			ps = conn.prepareStatement("INSERT INTO " + this.getName() + 
+					" (player, material, amount, metadata, storage_unique, created_at, created_by, updated_at, modified_by, order_by)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			
 			ps.setString(1, player.getUniqueId().toString());
 			ps.setString(2, material.name());
 			ps.setInt(3, 0);
 			ps.setString(4, metadata);
-			ps.setString(5, UUID.randomUUID().toString());
+			if(storage.getUnique() == null) {
+				ps.setString(5, UUID.randomUUID().toString());
+				storage.setUnique(UUID.randomUUID().toString());
+			} else {
+				ps.setString(5, storage.getUnique());
+			}
 			ps.setString(6, dateString);
+			ps.setString(7, created.getUniqueId().toString());
+			ps.setString(8, dateString);
+			ps.setString(9, created.getUniqueId().toString());
+			ps.setInt(10, order);
+			
+			ps.execute();
+		} catch (SQLException ex) {
+			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+					ex);
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException ex) {
+				getDb().getPlugin().getLogger().log(Level.SEVERE,
+						Errors.sqlConnectionClose(), ex);
+			}
+		}
+		return;
+	}
+	
+	public void deletePlayerStorage(Storage storage) {
+		OfflinePlayer player = storage.getPlayer();
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try {
+			conn = getDb().getSQLConnection();
+			ps = conn.prepareStatement("DELETE FROM " + this.getName() + 
+					" WHERE player = ? AND storage_unique = ?");
+			
+			ps.setString(1, player.getUniqueId().toString());
+			ps.setString(2, storage.getUnique());
 			
 			ps.execute();
 		} catch (SQLException ex) {
