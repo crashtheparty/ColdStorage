@@ -3,6 +3,7 @@ package org.ctp.coldstorage.handlers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -132,7 +133,7 @@ public class ColdStorageInventory {
 			ItemStack delete = new ItemStack(Material.BARRIER);
 			ItemMeta deleteMeta = delete.getItemMeta();
 			deleteMeta.setDisplayName(ChatColor.YELLOW + "Delete Cold Storage List");
-			String refund = admin != null ? EconUtils.stringifyRefund(show) : "No Refund";
+			String refund = admin == null ? EconUtils.stringifyRefund(show) : "No Refund";
 			deleteMeta.setLore(Arrays.asList(ChatColor.GOLD + "Refund: " + ChatColor.DARK_AQUA + refund));
 			delete.setItemMeta(deleteMeta);
 			inv.setItem(41, delete);
@@ -141,7 +142,7 @@ public class ColdStorageInventory {
 		ItemStack newStorage = new ItemStack(Material.PAPER);
 		ItemMeta newStorageMeta = newStorage.getItemMeta();
 		newStorageMeta.setDisplayName(ChatColor.YELLOW + "Add New Cold Storage");
-		String price = admin != null ? EconUtils.stringifyPrice(show) : "Free";
+		String price = admin == null ? EconUtils.stringifyPrice(show) : "Free";
 		newStorageMeta.setLore(Arrays.asList(ChatColor.GOLD + "Price: " + ChatColor.DARK_AQUA + price, ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
 		newStorage.setItemMeta(newStorageMeta);
 		inv.setItem(49, newStorage);
@@ -216,7 +217,7 @@ public class ColdStorageInventory {
 			ItemStack delete = new ItemStack(Material.BARRIER);
 			ItemMeta deleteMeta = delete.getItemMeta();
 			deleteMeta.setDisplayName(ChatColor.YELLOW + "Delete Cold Storage List");
-			String refund = admin != null ? EconUtils.stringifyRefund(show) : "No Refund";
+			String refund = admin == null ? EconUtils.stringifyRefund(show) : "No Refund";
 			deleteMeta.setLore(Arrays.asList(ChatColor.GOLD + "Refund: " + ChatColor.DARK_AQUA + refund));
 			delete.setItemMeta(deleteMeta);
 			inv.setItem(41, delete);
@@ -340,23 +341,31 @@ public class ColdStorageInventory {
 		}
 	}
 	
-	public void openColdStorage(ItemStack item) {
-		setScreen(Screen.OPEN);
+	public void openColdStorage(ItemStack item, String id) {
 		if(item == null) return;
-		ItemMeta itemMeta = item.getItemMeta();
-		List<String> lore = itemMeta.getLore();
-		String id = "";
-		if(lore.size() > 0) {
-			id = lore.get(0).split(ChatColor.GOLD + "Amount")[0];
-		}
-		if(id != "") {
-			id = ChatUtilities.revealText(id);
-		} else {
-			return;
+		if(id == null) {
+			ItemMeta itemMeta = item.getItemMeta();
+			List<String> lore = itemMeta.getLore();
+			id = "";
+			if(lore.size() > 0) {
+				id = lore.get(0).split(ChatColor.GOLD + "Amount")[0];
+			}
+			if(id != "") {
+				id = ChatUtilities.revealText(id);
+			} else {
+				return;
+			}
 		}
 		setUnique(id);
+		setScreen(Screen.OPEN);
 		
 		Storage storage = Storage.getStorage(player, id);
+		
+		if(storage == null) {
+			ChatUtilities.sendMessage(show, "There was an issue opening this storage. Please ask an administrator for assistance.");
+			ChatUtilities.sendToConsole(Level.WARNING, "Storage was null: Player - " + player.getName() + " ID - " + id);
+			return;
+		}
 		
 		Inventory inv = Bukkit.createInventory(null, 27, "Cold Storage: " + item.getType().name());
 		

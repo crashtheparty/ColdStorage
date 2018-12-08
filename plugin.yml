@@ -1,5 +1,5 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 1.1.0
+version: 1.1.1
 name: ColdStorage
 api-version: 1.13
 commands:
@@ -19,7 +19,7 @@ permissions:
         description: Allows player to open other player's cold storages
         default: op
     coldstorage.free:
-        description: Allows player to open other player's cold storages
+        description: Allows player to create cold storages for free
         default: false
     coldstorage.delete:
         description: Allows player to delete their own cold storages

@@ -77,7 +77,7 @@ public class InventoryClick implements Listener{
 					if(event.getSlot() < 36) {
 						ItemStack item = openedInv.getItem(event.getSlot());
 						if(item != null && item.getType() != Material.AIR) {
-							csInv.openColdStorage(openedInv.getItem(event.getSlot()));
+							csInv.openColdStorage(item, null);
 						}
 					}
 				}
@@ -112,7 +112,7 @@ public class InventoryClick implements Listener{
 					if(event.getSlot() < 36) {
 						ItemStack item = openedInv.getItem(event.getSlot());
 						if(item != null && item.getType() != Material.AIR) {
-							csInv.editColdStorage(openedInv.getItem(event.getSlot()));
+							csInv.editColdStorage(item);
 						}
 					}
 				}
@@ -147,7 +147,7 @@ public class InventoryClick implements Listener{
 					if(event.getSlot() < 36) {
 						ItemStack item = openedInv.getItem(event.getSlot());
 						if(item != null && item.getType() != Material.AIR) {
-							csInv.deleteColdStorage(openedInv.getItem(event.getSlot()));
+							csInv.deleteColdStorage(item);
 						}
 					}
 				}
@@ -180,7 +180,7 @@ public class InventoryClick implements Listener{
 								storage.setAmount(newAmount);
 								storage.updateStorage(player);
 								inv.setItem(event.getSlot(), replace);
-								csInv.openColdStorage(storageItem);
+								csInv.openColdStorage(storageItem, id);
 							} else {
 								ChatUtilities.sendMessage(player, "Item must have matching metadata!");
 							}
@@ -241,7 +241,7 @@ public class InventoryClick implements Listener{
 							}
 							
 							storage.updateStorage(player);
-							csInv.openColdStorage(storageItem);
+							csInv.openColdStorage(storageItem, id);
 						}
 					}
 				}

@@ -48,7 +48,7 @@ public class InventoryUtilities {
 				
 			}else if(invItem.getType().equals(type)) {
 				if(ItemSerialization.itemToData(item).equals(ItemSerialization.itemToData(invItem))) {
-					remove += item.getAmount();
+					remove += invItem.getAmount();
 				}
 			}
 		}
