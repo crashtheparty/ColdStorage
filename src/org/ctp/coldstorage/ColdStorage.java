@@ -76,8 +76,8 @@ public class ColdStorage extends JavaPlugin {
 		db = new SQLite(plugin);
 		db.load();
 		
-		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/EnchantmentSolution/master/VersionHistory", 
-				"https://www.spigotmc.org/resources/enchantment-solution.59556/", "https://github.com/crashtheparty/EnchantmentSolution", 
+		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/ColdStorage/master/VersionHistory", 
+				"https://www.spigotmc.org/resources/cold-storage.59581/", "https://github.com/crashtheparty/ColdStorage", 
 				CONFIG.getBoolean("get_latest_version"));
 		pm.registerEvents(check, this);
 		checkVersion();
