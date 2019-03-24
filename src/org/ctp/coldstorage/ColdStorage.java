@@ -106,6 +106,7 @@ public class ColdStorage extends JavaPlugin {
 		CONFIG.addDefault("price_refund", 250);
 		CONFIG.addDefault("price_item_refund", ItemSerialization.itemToString(new ItemStack(Material.DIAMOND, 1)));
 		CONFIG.addDefault("aliases", Arrays.asList());
+		CONFIG.addDefault("get_latest_version", true);
 		CONFIG.addDefault("open_message", "Opening cold storage...");
 		if (hasVault()) {
 			CONFIG.addDefault("vault", true);
