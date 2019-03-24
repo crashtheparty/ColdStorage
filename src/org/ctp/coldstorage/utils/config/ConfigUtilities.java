@@ -14,7 +14,7 @@ public class ConfigUtilities {
 	public static String OPEN_MESSAGE = "Opening cold storage...";
 	public static List<String> ALIASES = new ArrayList<String>();
 	
-	public static void getFromConfigs(SimpleConfig config) {
+	public static void getFromConfigs(YamlConfig config) {
 		if(config.contains("max_storage_size")) {
 			MAX_STORAGE_SIZE = config.getInt("max_storage_size");
 			if(MAX_STORAGE_SIZE > 2000000) {

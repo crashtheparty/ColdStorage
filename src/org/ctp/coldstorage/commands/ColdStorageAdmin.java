@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.InventoryUtilities;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 
@@ -28,20 +28,20 @@ public class ColdStorageAdmin implements CommandExecutor{
 					}
 					if(oPlayer != null) {
 						if(oPlayer.getUniqueId().equals(player.getUniqueId())) {
-							ChatUtilities.sendMessage(player, "Can't open your own cold storage as admin. Use /csopen.");
+							ChatUtils.sendMessage(player, "Can't open your own cold storage as admin. Use /csopen.");
 							return false;
 						}
 						if(oPlayer.isOp()) {
-							ChatUtilities.sendMessage(player, "Can't open an op's cold storage.");
+							ChatUtils.sendMessage(player, "Can't open an op's cold storage.");
 							return false;
 						}
-						ChatUtilities.sendMessage(player, ConfigUtilities.OPEN_MESSAGE);
+						ChatUtils.sendMessage(player, ConfigUtilities.OPEN_MESSAGE);
 						InventoryUtilities.addInventory(player, oPlayer);
 					} else {
-						ChatUtilities.sendMessage(player, "Player specified does not exist!");
+						ChatUtils.sendMessage(player, "Player specified does not exist!");
 					}
 				} else {
-					ChatUtilities.sendMessage(player, "Must specify a player!");
+					ChatUtils.sendMessage(player, "Must specify a player!");
 				}
 			}
 		}

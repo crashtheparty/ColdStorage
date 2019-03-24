@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 
 public class ItemSerialization {
 
@@ -92,14 +92,14 @@ public class ItemSerialization {
 			} else if ((itemAttribute[0].equals("enchant"))
 					&& (createdItemStack.booleanValue())) {
 				NamespacedKey key = null;
-				String[] enchString = itemAttribute[1].split("+");
+				String[] enchString = itemAttribute[1].split("\\+");
 				if(enchString[0].equalsIgnoreCase("minecraft")) {
 					key = NamespacedKey.minecraft(enchString[1]);
 				} else {
 					key = new NamespacedKey(Bukkit.getPluginManager().getPlugin(enchString[0]), enchString[1]);
 				}
 				if(key == null) {
-					ChatUtilities.sendToConsole(
+					ChatUtils.sendToConsole(
 							"Key is null.");
 				}
 				
@@ -108,10 +108,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtilities.sendToConsole(
+					ChatUtils.sendToConsole(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtilities.sendToConsole(
+					ChatUtils.sendToConsole(
 							"Please fix the name in config!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))
@@ -224,10 +224,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtilities.sendToConsole(
+					ChatUtils.sendToConsole(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtilities.sendToConsole(
+					ChatUtils.sendToConsole(
 							"Please fix the name in database or add the plugin!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))

@@ -16,11 +16,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.database.tables.StorageTable;
 import org.ctp.coldstorage.database.tables.Table;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.EconUtils;
+import org.ctp.coldstorage.utils.InventoryUtilities;
 import org.ctp.coldstorage.utils.Storage;
 import org.ctp.coldstorage.utils.StorageList;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
+import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public class ColdStorageInventory {
 
@@ -97,7 +99,7 @@ public class ColdStorageInventory {
 			ItemMeta storageItemMeta = storageItem.getItemMeta();
 			storageItemMeta.setDisplayName(ChatColor.GOLD + "Type: " + ChatColor.DARK_AQUA + "" + storage.getMaterial().name());
 			List<String> lore = new ArrayList<String>();
-			lore.addAll(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
+			lore.addAll(Arrays.asList(ChatUtils.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
 					ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
 			if(!storage.getMeta().equals("")) {
 				lore.add(ChatColor.GOLD + "Metadata: ");
@@ -123,11 +125,17 @@ public class ColdStorageInventory {
 			inv.setItem(45, prevPage);
 		}
 		
+		ItemStack insertAll = new ItemStack(Material.COBBLESTONE);
+		ItemMeta insertAllMeta = insertAll.getItemMeta();
+		insertAllMeta.setDisplayName(ChatColor.YELLOW + "Insert to All Cold Storages");
+		insertAll.setItemMeta(insertAllMeta);
+		inv.setItem(40, insertAll);
+		
 		ItemStack editOrder = new ItemStack(Material.PAPER);
 		ItemMeta editOrderMeta = editOrder.getItemMeta();
 		editOrderMeta.setDisplayName(ChatColor.YELLOW + "Edit Display Order");
 		editOrder.setItemMeta(editOrderMeta);
-		inv.setItem(39, editOrder);
+		inv.setItem(47, editOrder);
 		
 		if((admin != null && show.hasPermission("coldstorage.admindelete")) || (admin == null && show.hasPermission("coldstorage.delete"))) {
 			ItemStack delete = new ItemStack(Material.BARRIER);
@@ -136,7 +144,7 @@ public class ColdStorageInventory {
 			String refund = admin == null ? EconUtils.stringifyRefund(show) : "No Refund";
 			deleteMeta.setLore(Arrays.asList(ChatColor.GOLD + "Refund: " + ChatColor.DARK_AQUA + refund));
 			delete.setItemMeta(deleteMeta);
-			inv.setItem(41, delete);
+			inv.setItem(51, delete);
 		}
 		
 		ItemStack newStorage = new ItemStack(Material.PAPER);
@@ -181,7 +189,7 @@ public class ColdStorageInventory {
 			ItemMeta storageItemMeta = storageItem.getItemMeta();
 			storageItemMeta.setDisplayName(ChatColor.GOLD + "Type: " + ChatColor.DARK_AQUA + "" + storage.getMaterial().name());
 			List<String> lore = new ArrayList<String>();
-			lore.addAll(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
+			lore.addAll(Arrays.asList(ChatUtils.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
 					ChatColor.GOLD + "Order: " + ChatColor.DARK_AQUA + storage.getOrderBy()));
 			if(!storage.getMeta().equals("")) {
 				lore.add(ChatColor.GOLD + "Metadata: ");
@@ -256,7 +264,7 @@ public class ColdStorageInventory {
 			ItemMeta storageItemMeta = storageItem.getItemMeta();
 			storageItemMeta.setDisplayName(ChatColor.GOLD + "Type: " + ChatColor.DARK_AQUA + "" + storage.getMaterial().name());
 			List<String> lore = new ArrayList<String>();
-			lore.addAll(Arrays.asList(ChatUtilities.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
+			lore.addAll(Arrays.asList(ChatUtils.hideText(storage.getUnique()) + ChatColor.GOLD + "Amount: " + ChatColor.DARK_AQUA + "" + storage.getAmount(), 
 					ChatColor.GOLD + "Can Delete: " + ChatColor.DARK_AQUA + (storage.getAmount() > 0 ? "Too Many Items In Storage" : "Yes"), 
 					ChatColor.GOLD + "Refund: " + ChatColor.DARK_AQUA + EconUtils.stringifyRefund(show)));
 			if(!storage.getMeta().equals("")) {
@@ -268,7 +276,7 @@ public class ColdStorageInventory {
 			inv.setItem(i, storageItem);
 		}
 		
-		if(page == 1 && storages.size() > PAGING) {
+		if(storages.size() > PAGING * page) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextPageMeta = nextPage.getItemMeta();
 			nextPageMeta.setDisplayName(ChatColor.BLUE + "Next Page");
@@ -308,7 +316,7 @@ public class ColdStorageInventory {
 	public void createColdStorage(ItemStack item) {
 		Material type = item.getType();
 		if(type == null || type.equals(Material.AIR)) {
-			ChatUtilities.sendMessage(show, "Not valid material; please select a different item.");
+			ChatUtils.sendMessage(show, "Not valid material; please select a different item.");
 		} else {
 			Table table = ColdStorage.getDb().getTable(StorageTable.class);
 			StorageTable storageTable = null;
@@ -325,17 +333,17 @@ public class ColdStorageInventory {
 					Player p = (Player) player;
 					if(EconUtils.takeMoney(p, admin != null)) {
 						storageTable.addPlayerStorage(storage, show);
-						ChatUtilities.sendMessage(show, "Paid " + EconUtils.stringifyPrice(p) + " on Cold Storage for " + type.name() + ".");
+						ChatUtils.sendMessage(show, "Paid " + EconUtils.stringifyPrice(p) + " on Cold Storage for " + type.name() + ".");
 						listColdStorage();
 					} else {
-						ChatUtilities.sendMessage(show, "Don't have the money for a new cold storage: " + EconUtils.stringifyPrice(p));
+						ChatUtils.sendMessage(show, "Don't have the money for a new cold storage: " + EconUtils.stringifyPrice(p));
 					}
 				} else {
-					ChatUtilities.sendMessage(show, "Player " + player.getName() + " must be online to take money from them.");
+					ChatUtils.sendMessage(show, "Player " + player.getName() + " must be online to take money from them.");
 				}
 			} else {
 				storageTable.addPlayerStorage(storage, show);
-				ChatUtilities.sendMessage(show, "Admin created cold storage for " + player.getName() + " for " + type.name() + ".");
+				ChatUtils.sendMessage(show, "Admin created cold storage for " + player.getName() + " for " + type.name() + ".");
 				listColdStorage();
 			}
 		}
@@ -351,7 +359,7 @@ public class ColdStorageInventory {
 				id = lore.get(0).split(ChatColor.GOLD + "Amount")[0];
 			}
 			if(id != "") {
-				id = ChatUtilities.revealText(id);
+				id = ChatUtils.revealText(id);
 			} else {
 				return;
 			}
@@ -362,8 +370,8 @@ public class ColdStorageInventory {
 		Storage storage = Storage.getStorage(player, id);
 		
 		if(storage == null) {
-			ChatUtilities.sendMessage(show, "There was an issue opening this storage. Please ask an administrator for assistance.");
-			ChatUtilities.sendToConsole(Level.WARNING, "Storage was null: Player - " + player.getName() + " ID - " + id);
+			ChatUtils.sendMessage(show, "There was an issue opening this storage. Please ask an administrator for assistance.");
+			ChatUtils.sendToConsole(Level.WARNING, "Storage was null: Player - " + player.getName() + " ID - " + id);
 			return;
 		}
 		
@@ -414,14 +422,14 @@ public class ColdStorageInventory {
 			id = lore.get(0).split(ChatColor.GOLD + "Amount")[0];
 		}
 		if(id != "") {
-			id = ChatUtilities.revealText(id);
+			id = ChatUtils.revealText(id);
 		} else {
 			return;
 		}
 		setUnique(id);
 		
 		setEditing(true);
-		ChatUtilities.sendMessage(show, "Type a number into chat to set the order.");
+		ChatUtils.sendMessage(show, "Type a number into chat to set the order.");
 		show.closeInventory();
 	}
 	
@@ -434,7 +442,7 @@ public class ColdStorageInventory {
 			id = lore.get(0).split(ChatColor.GOLD + "Amount")[0];
 		}
 		if(id != "") {
-			id = ChatUtilities.revealText(id);
+			id = ChatUtils.revealText(id);
 		} else {
 			return;
 		}
@@ -444,6 +452,22 @@ public class ColdStorageInventory {
 		storage.deleteStorage(show);
 		
 		listDeleteColdStorage();
+	}
+	
+	public void insertAll() {
+		StorageList list = StorageList.getList(player);
+		for(Storage storage : list.getStorages()) {
+			ItemStack storageItem = ItemSerialization.dataToItem(storage.getMaterial(), storage.getAmount(), storage.getMeta());
+			if(storageItem != null) {
+				int amount = InventoryUtilities.maxRemoveFromInventory(show, storageItem);
+				storageItem = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
+				show.getInventory().removeItem(storageItem);
+				storage.setAmount(storage.getAmount() + amount);
+				
+				storage.updateStorage(player);
+			}
+		}
+		update(1);
 	}
 
 	public Screen getScreen() {

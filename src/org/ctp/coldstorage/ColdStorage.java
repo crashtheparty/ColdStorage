@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
@@ -21,12 +22,13 @@ import org.ctp.coldstorage.database.SQLite;
 import org.ctp.coldstorage.listeners.ChatMessage;
 import org.ctp.coldstorage.listeners.InventoryClick;
 import org.ctp.coldstorage.listeners.InventoryClose;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.listeners.VersionCheck;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.alias.Alias;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
-import org.ctp.coldstorage.utils.config.SimpleConfig;
-import org.ctp.coldstorage.utils.config.SimpleConfigManager;
+import org.ctp.coldstorage.utils.config.YamlConfig;
+import org.ctp.coldstorage.version.PluginVersion;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -34,18 +36,21 @@ public class ColdStorage extends JavaPlugin {
 
 	public static ColdStorage plugin;
 	private static SQLite db;
-	private static SimpleConfig CONFIG;
-	public SimpleConfigManager manager;
+	private static YamlConfig CONFIG;
 	private static Economy ECON = null;
 	private List<Alias> commands = new ArrayList<Alias>();
+	private VersionCheck check;
+	private PluginVersion pluginVersion;
 
-	public static SimpleConfig getDefaultConfig() {
+	public static YamlConfig getDefaultConfig() {
 		return CONFIG;
 	}
 
 	public void onEnable() {
 		plugin = this;
 
+		setPluginVersion(new PluginVersion(this, getDescription().getVersion()));
+		
 		try {
 			File dataFolder = plugin.getDataFolder();
 			if (!dataFolder.exists()) {
@@ -70,6 +75,12 @@ public class ColdStorage extends JavaPlugin {
 
 		db = new SQLite(plugin);
 		db.load();
+		
+		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/EnchantmentSolution/master/VersionHistory", 
+				"https://www.spigotmc.org/resources/enchantment-solution.59556/", "https://github.com/crashtheparty/EnchantmentSolution", 
+				CONFIG.getBoolean("get_latest_version"));
+		pm.registerEvents(check, this);
+		checkVersion();
 	}
 
 	public static SQLite getDb() {
@@ -77,9 +88,18 @@ public class ColdStorage extends JavaPlugin {
 	}
 
 	private void initiateConfigs() {
-		manager = new SimpleConfigManager(this);
+		if (!getDataFolder().exists()) {
+			getDataFolder().mkdirs();
+		}
+		
+		File file = new File(getDataFolder() + "/config.yml");
+		YamlConfiguration.loadConfiguration(file);
+		
 		String[] header = { "ColdStorage", "Developed and written by", "crashtheparty" };
-		CONFIG = manager.getNewConfig("config.yml", header);
+		CONFIG = new YamlConfig(file, header);
+		
+		CONFIG.getFromConfig();
+		
 		CONFIG.addDefault("max_storage_size", Integer.valueOf(2000000));
 		CONFIG.addDefault("price", 1000);
 		CONFIG.addDefault("price_item", ItemSerialization.itemToString(new ItemStack(Material.DIAMOND, 4)));
@@ -108,7 +128,7 @@ public class ColdStorage extends JavaPlugin {
 			try {
 				commands.add(new Alias(alias, getCommand("csopen")));
 			} catch (Exception e) {
-				ChatUtilities.sendToConsole(Level.WARNING, "Command alias " + alias + " couldn't be added.");
+				ChatUtils.sendToConsole(Level.WARNING, "Command alias " + alias + " couldn't be added.");
 			}
 		}
 	}
@@ -130,7 +150,7 @@ public class ColdStorage extends JavaPlugin {
 		
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
-			ChatUtilities.sendMessage(player, "Config reloaded.");
+			ChatUtils.sendMessage(player, "Config reloaded.");
 		}
 		
 		if(newAlias) {
@@ -139,9 +159,9 @@ public class ColdStorage extends JavaPlugin {
 				setAliases();
 				if(sender instanceof Player) {
 					Player player = (Player) sender;
-					ChatUtilities.sendMessage(player, "Please note that command autocomplete will not work with updated aliases until a reload.");
+					ChatUtils.sendMessage(player, "Please note that command autocomplete will not work with updated aliases until a reload.");
 				} else {
-					ChatUtilities.sendToConsole(Level.WARNING, "Please note that command autocomplete will not work with updated aliases until a reload.");
+					ChatUtils.sendToConsole(Level.WARNING, "Please note that command autocomplete will not work with updated aliases until a reload.");
 				}
 			} catch(IllegalStateException ex) {
 				ex.printStackTrace();
@@ -165,5 +185,17 @@ public class ColdStorage extends JavaPlugin {
 	public static Economy getEconomy() {
 		return ECON;
 	}
+
+	public PluginVersion getPluginVersion() {
+		return pluginVersion;
+	}
+
+	public void setPluginVersion(PluginVersion pluginVersion) {
+		this.pluginVersion = pluginVersion;
+	}
+	
+	private void checkVersion(){
+		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, check, 20l, 20 * 60 * 60 * 4l);
+    }
 
 }

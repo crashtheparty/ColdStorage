@@ -77,7 +77,7 @@ public class Storage {
 		return storageTable.getStorage(player, id);
 	}
 	
-	public void updateStorage(Player updated) {
+	public void updateStorage(OfflinePlayer player) {
 		Table table = ColdStorage.getDb().getTable(StorageTable.class);
 		StorageTable storageTable = null;
 		if(table instanceof StorageTable) {
@@ -85,7 +85,7 @@ public class Storage {
 		} else {
 			return;
 		}
-		storageTable.setPlayerStorage(this, updated);
+		storageTable.setPlayerStorage(this, player);
 	}
 	
 	public void deleteStorage(Player deleted) {

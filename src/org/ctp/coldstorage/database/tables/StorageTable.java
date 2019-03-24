@@ -16,7 +16,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.ctp.coldstorage.database.Errors;
 import org.ctp.coldstorage.database.SQLite;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.Storage;
 
 public class StorageTable extends Table{
@@ -131,7 +131,7 @@ public class StorageTable extends Table{
 		return found;
 	}
 	
-	public void setPlayerStorage(Storage storage, Player modified) {
+	public void setPlayerStorage(Storage storage, OfflinePlayer player) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		boolean hasRecord = hasStorageRecord(storage);
@@ -166,7 +166,9 @@ public class StorageTable extends Table{
 			}
 		} else {
 			getDb().getPlugin().getLogger().log(Level.WARNING, "Missing possible record with storage: " + storage.toString());
-			ChatUtilities.sendMessage(modified, "Issue with the plugin. Please contact an administrator to get this resolved.");
+			if(player.isOnline()) {
+				ChatUtils.sendMessage(player.getPlayer(), "Issue with the plugin. Please contact an administrator to get this resolved.");
+			}
 		}
 		return;
 	}

@@ -1,10 +1,11 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 1.1.1
+version: 1.1.2
 name: ColdStorage
 api-version: 1.13
 commands:
     csopen:
         description: Opens the cold storage
+        permission: coldstorage.open
     csreload:
         description: Reload the cold storage configs
         permission: coldstorage.reload
@@ -23,6 +24,9 @@ permissions:
         default: false
     coldstorage.delete:
         description: Allows player to delete their own cold storages
+        default: true
+    coldstorage.open:
+        description: Allows player to delete other player's cold storages
         default: true
     coldstorage.admindelete:
         description: Allows player to delete other player's cold storages

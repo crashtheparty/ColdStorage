@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.ctp.coldstorage.handlers.ColdStorageInventory;
 import org.ctp.coldstorage.handlers.ColdStorageInventory.Screen;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.InventoryUtilities;
 import org.ctp.coldstorage.utils.Storage;
 import org.ctp.coldstorage.utils.StorageList;
@@ -62,13 +62,18 @@ public class InventoryClick implements Listener{
 								csInv.selectColdStorageType();
 							}
 							break;
-						case 39:
-							if(openedInv.getItem(39) != null && openedInv.getItem(39).getType() == Material.PAPER) {
+						case 40:
+							if(openedInv.getItem(40) != null && openedInv.getItem(40).getType() == Material.COBBLESTONE) {
+								csInv.insertAll();
+							}
+							break;
+						case 47:
+							if(openedInv.getItem(47) != null && openedInv.getItem(47).getType() == Material.PAPER) {
 								csInv.listEditColdStorage(storageList.getPage());
 							}
 							break;
-						case 41:
-							if(openedInv.getItem(41) != null && openedInv.getItem(41).getType() == Material.BARRIER) {
+						case 51:
+							if(openedInv.getItem(51) != null && openedInv.getItem(51).getType() == Material.BARRIER) {
 								csInv.listDeleteColdStorage(storageList.getPage());
 							}
 							break;
@@ -155,7 +160,7 @@ public class InventoryClick implements Listener{
 				event.setCancelled(true);
 				ItemStack item = event.getCurrentItem();
 				if(item == null) {
-					ChatUtilities.sendMessage(player, "Please select a valid item!");
+					ChatUtils.sendMessage(player, "Please select a valid item!");
 				}
 				csInv.createColdStorage(item);
 			} else if (csInv.getScreen() == Screen.OPEN) {
@@ -175,17 +180,17 @@ public class InventoryClick implements Listener{
 								if(newAmount > ConfigUtilities.MAX_STORAGE_SIZE) {
 									replace = new ItemStack(item.getType(), newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
 									newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
-									ChatUtilities.sendMessage(player, "Item limit reached!");
+									ChatUtils.sendMessage(player, "Item limit reached!");
 								}
 								storage.setAmount(newAmount);
 								storage.updateStorage(player);
 								inv.setItem(event.getSlot(), replace);
 								csInv.openColdStorage(storageItem, id);
 							} else {
-								ChatUtilities.sendMessage(player, "Item must have matching metadata!");
+								ChatUtils.sendMessage(player, "Item must have matching metadata!");
 							}
 						} else {
-							ChatUtilities.sendMessage(player, "Not a valid item!");
+							ChatUtils.sendMessage(player, "Not a valid item!");
 						}
 					}
 				} else {

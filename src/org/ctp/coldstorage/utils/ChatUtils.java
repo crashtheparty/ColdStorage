@@ -19,10 +19,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.ctp.coldstorage.ColdStorage;
 
-public class ChatUtilities {
+public class ChatUtils {
 	
 	public static void sendToConsole(String message) {
 		Bukkit.getConsoleSender().sendMessage(ChatColor.stripColor(starter()) + message);
+	}
+	
+	public static void sendMessage(Player player, String message, String url) {
+		Bukkit.getServer().dispatchCommand(
+		        Bukkit.getConsoleSender(),
+		        "tellraw " + player.getName() + 
+		        " [{\"text\":\"" + starter() + message + "\"},{\"text\":\"" + url + "\", \"italic\": true, \"color\": \"green\", \"clickEvent\":{\"action\":\"open_url\",\"value\":\"" +
+		        url + "\"}}]");
 	}
 	
 	public static void broadcast(String message){
@@ -39,6 +47,18 @@ public class ChatUtilities {
 	
 	public static void sendToConsole(Level level, String message) {
 		ColdStorage.plugin.getLogger().log(level, message);
+	}
+	
+	public static void sendWarning(String message) {
+		sendToConsole(Level.WARNING, message);
+	}
+	
+	public static void sendInfo(String message) {
+		sendToConsole(Level.INFO, message);
+	}
+	
+	public static void sendSevere(String message) {
+		sendToConsole(Level.SEVERE, message);
 	}
 	
 	private static String starter(){

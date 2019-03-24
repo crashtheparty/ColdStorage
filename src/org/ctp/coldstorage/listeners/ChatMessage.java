@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.ctp.coldstorage.handlers.ColdStorageInventory;
 import org.ctp.coldstorage.handlers.ColdStorageInventory.Screen;
-import org.ctp.coldstorage.utils.ChatUtilities;
+import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.InventoryUtilities;
 import org.ctp.coldstorage.utils.Storage;
 
@@ -24,15 +24,15 @@ public class ChatMessage implements Listener{
 				try {
 					order = Integer.parseInt(chat);
 				} catch (Exception e) {
-					ChatUtilities.sendMessage(player, "Entered order not a number - set to 0.");
+					ChatUtils.sendMessage(player, "Entered order not a number - set to 0.");
 				}
 				Storage storage = Storage.getStorage(inv.getPlayer(), inv.getUnique());
 				if(storage != null) {
 					storage.setOrderBy(order);
 					storage.updateStorage(player);
-					ChatUtilities.sendMessage(player, "Updated the order.");
+					ChatUtils.sendMessage(player, "Updated the order.");
 				} else {
-					ChatUtilities.sendMessage(player, "Issue with storages - none selected.");
+					ChatUtils.sendMessage(player, "Issue with storages - none selected.");
 				}
 				inv.listEditColdStorage();
 			} else {
