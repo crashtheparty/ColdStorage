@@ -18,6 +18,7 @@ import org.ctp.coldstorage.utils.Storage;
 import org.ctp.coldstorage.utils.StorageList;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
+import org.ctp.coldstorage.utils.exception.ColdStorageOverMaxException;
 
 public class InventoryClick implements Listener{
 	
@@ -178,8 +179,14 @@ public class InventoryClick implements Listener{
 								ItemStack replace = new ItemStack(Material.AIR);
 								int newAmount = storage.getAmount() + item.getAmount();
 								if(newAmount > ConfigUtilities.MAX_STORAGE_SIZE) {
-									replace = new ItemStack(item.getType(), newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
-									newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
+									if(newAmount - ConfigUtilities.MAX_STORAGE_SIZE > item.getAmount()) {
+										replace = item;
+										newAmount = storage.getAmount();
+									} else {
+										replace = item.clone();
+										replace.setAmount(newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
+										newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
+									}
 									ChatUtils.sendMessage(player, "Item limit reached!");
 								}
 								storage.setAmount(newAmount);
@@ -226,7 +233,12 @@ public class InventoryClick implements Listener{
 								storage.setAmount(storage.getAmount() - amount);
 								break;
 							case 12:
-								amount = InventoryUtilities.maxRemoveFromInventory(player, itemAdd);
+								try {
+									amount = InventoryUtilities.maxRemoveFromInventory(storage.getAmount(), player, itemAdd);
+								} catch (ColdStorageOverMaxException ex) {
+									ChatUtils.sendMessage(player, ex.getMessage());
+									return;
+								}
 								itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
 								player.getInventory().removeItem(itemAdd);
 								storage.setAmount(storage.getAmount() + amount);

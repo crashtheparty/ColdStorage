@@ -23,6 +23,7 @@ import org.ctp.coldstorage.utils.Storage;
 import org.ctp.coldstorage.utils.StorageList;
 import org.ctp.coldstorage.utils.config.ConfigUtilities;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
+import org.ctp.coldstorage.utils.exception.ColdStorageOverMaxException;
 
 public class ColdStorageInventory {
 
@@ -459,7 +460,13 @@ public class ColdStorageInventory {
 		for(Storage storage : list.getStorages()) {
 			ItemStack storageItem = ItemSerialization.dataToItem(storage.getMaterial(), storage.getAmount(), storage.getMeta());
 			if(storageItem != null) {
-				int amount = InventoryUtilities.maxRemoveFromInventory(show, storageItem);
+				int amount = 0;
+				try {
+					amount = InventoryUtilities.maxRemoveFromInventory(storage.getAmount(), show, storageItem);
+				} catch (ColdStorageOverMaxException ex) {
+					ChatUtils.sendMessage(show, ex.getMessage());
+					return;
+				}
 				storageItem = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
 				show.getInventory().removeItem(storageItem);
 				storage.setAmount(storage.getAmount() + amount);

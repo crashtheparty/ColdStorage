@@ -9,7 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.ctp.coldstorage.handlers.ColdStorageInventory;
+import org.ctp.coldstorage.utils.config.ConfigUtilities;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
+import org.ctp.coldstorage.utils.exception.ColdStorageOverMaxException;
 
 public class InventoryUtilities {
 	
@@ -36,7 +38,8 @@ public class InventoryUtilities {
 		return add;
 	}
 	
-	public static int maxRemoveFromInventory(Player player, ItemStack item) {
+	public static int maxRemoveFromInventory(int current, Player player, ItemStack item) throws ColdStorageOverMaxException {
+		if(current >= ConfigUtilities.MAX_STORAGE_SIZE) throw new ColdStorageOverMaxException(current, ConfigUtilities.MAX_STORAGE_SIZE);
 		int remove = 0;
 		
 		Material type = item.getType();
@@ -52,6 +55,7 @@ public class InventoryUtilities {
 				}
 			}
 		}
+		if(remove + current > ConfigUtilities.MAX_STORAGE_SIZE) remove = ConfigUtilities.MAX_STORAGE_SIZE - current;
 		return remove;
 	}
 
