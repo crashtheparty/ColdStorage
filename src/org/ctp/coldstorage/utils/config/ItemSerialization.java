@@ -99,7 +99,7 @@ public class ItemSerialization {
 					key = new NamespacedKey(Bukkit.getPluginManager().getPlugin(enchString[0]), enchString[1]);
 				}
 				if(key == null) {
-					ChatUtils.sendToConsole(
+					ChatUtils.sendInfo(
 							"Key is null.");
 				}
 				
@@ -108,10 +108,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtils.sendToConsole(
+					ChatUtils.sendWarning(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtils.sendToConsole(
+					ChatUtils.sendWarning(
 							"Please fix the name in config!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))
@@ -224,10 +224,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtils.sendToConsole(
+					ChatUtils.sendWarning(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtils.sendToConsole(
+					ChatUtils.sendWarning(
 							"Please fix the name in database or add the plugin!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))

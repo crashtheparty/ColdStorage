@@ -33,6 +33,7 @@ public class ColdStorageInventory {
 	private Screen screen;
 	private boolean opening = false, editing = false;
 	private String unique = null;
+	private Inventory inventory;
 	
 	public ColdStorageInventory(OfflinePlayer player) {
 		this.player = player;
@@ -91,6 +92,7 @@ public class ColdStorageInventory {
 		} else {
 			inv = Bukkit.createInventory(null, 54, player.getName() + "'s List Page " + page);
 		}
+		inv = open(inv);
 		for(int i = 0; i < PAGING; i++) {
 			int storageNum = i + (PAGING * (page - 1));
 			if(storages.size() <= storageNum) break;
@@ -155,8 +157,6 @@ public class ColdStorageInventory {
 		newStorageMeta.setLore(Arrays.asList(ChatColor.GOLD + "Price: " + ChatColor.DARK_AQUA + price, ChatColor.GOLD + "Max Storage Size: " + ChatColor.DARK_AQUA + ConfigUtilities.MAX_STORAGE_SIZE));
 		newStorage.setItemMeta(newStorageMeta);
 		inv.setItem(49, newStorage);
-
-		open(inv);
 	}
 	
 	public void listEditColdStorage(int page) {
@@ -181,6 +181,7 @@ public class ColdStorageInventory {
 		} else {
 			inv = Bukkit.createInventory(null, 54, player.getName() + " Edits Page " + page);
 		}
+		inv = open(inv);
 		for(int i = 0; i < PAGING; i++) {
 			int storageNum = i + (PAGING * (page - 1));
 			if(storages.size() <= storageNum) break;
@@ -231,8 +232,6 @@ public class ColdStorageInventory {
 			delete.setItemMeta(deleteMeta);
 			inv.setItem(41, delete);
 		}
-
-		open(inv);
 	}
 	
 	public void listDeleteColdStorage(int page) {
@@ -256,6 +255,7 @@ public class ColdStorageInventory {
 		} else {
 			inv = Bukkit.createInventory(null, 54, player.getName() + "'s List Page " + page);
 		}
+		inv = open(inv);
 		for(int i = 0; i < PAGING; i++) {
 			int storageNum = i + (PAGING * (page - 1));
 			if(storages.size() <= storageNum) break;
@@ -303,8 +303,6 @@ public class ColdStorageInventory {
 		listOrderMeta.setDisplayName(ChatColor.YELLOW + "List Display Order");
 		listOrder.setItemMeta(listOrderMeta);
 		inv.setItem(41, listOrder);
-
-		open(inv);
 	}
 	
 	public void selectColdStorageType() {
@@ -377,6 +375,7 @@ public class ColdStorageInventory {
 		}
 		
 		Inventory inv = Bukkit.createInventory(null, 27, "Cold Storage: " + item.getType().name());
+		inv = open(inv);
 		
 		ItemStack itemStack = new ItemStack(item.getType());
 		ItemMeta itemStackMeta = itemStack.getItemMeta();
@@ -410,8 +409,6 @@ public class ColdStorageInventory {
 		backMeta.setDisplayName(ChatColor.BLUE + "Go Back");
 		back.setItemMeta(backMeta);
 		inv.setItem(18, back);
-		
-		open(inv);
 	}
 	
 	public void editColdStorage(ItemStack item) {
@@ -465,7 +462,7 @@ public class ColdStorageInventory {
 					amount = InventoryUtilities.maxRemoveFromInventory(storage.getAmount(), show, storageItem);
 				} catch (ColdStorageOverMaxException ex) {
 					ChatUtils.sendMessage(show, ex.getMessage());
-					return;
+					continue;
 				}
 				storageItem = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
 				show.getInventory().removeItem(storageItem);
@@ -497,12 +494,27 @@ public class ColdStorageInventory {
 		return opening;
 	}
 	
-	public void open(Inventory inv) {
+	public Inventory open(Inventory inv) {
 		opening = true;
-		show.openInventory(inv);
+		if(inventory == null) {
+			inventory = inv;
+			show.openInventory(inv);
+		} else {
+			if(inv.getSize() == inventory.getSize()) {
+				inv = show.getOpenInventory().getTopInventory();
+				inventory = inv;
+			} else {
+				inventory = inv;
+				show.openInventory(inv);
+			}
+		}
+		for(int i = 0; i < inventory.getSize(); i++) {
+			inventory.setItem(i, new ItemStack(Material.AIR));
+		}
 		if(opening) {
 			opening = false;
 		}
+		return inv;
 	}
 
 	public String getUnique() {
