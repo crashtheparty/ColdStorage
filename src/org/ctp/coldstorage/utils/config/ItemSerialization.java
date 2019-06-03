@@ -20,6 +20,7 @@ public class ItemSerialization {
 
 	public static String itemToString(ItemStack item) {
 		String itemString = "";
+		if (item == null) return itemString;
 		if (item.getType() != null) {
 			itemString = itemString + "name@" + item.getType();
 		}
@@ -99,7 +100,7 @@ public class ItemSerialization {
 					key = new NamespacedKey(Bukkit.getPluginManager().getPlugin(enchString[0]), enchString[1]);
 				}
 				if(key == null) {
-					ChatUtils.sendInfo(
+					ChatUtils.sendToConsole(
 							"Key is null.");
 				}
 				
@@ -108,10 +109,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtils.sendWarning(
+					ChatUtils.sendToConsole(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtils.sendWarning(
+					ChatUtils.sendToConsole(
 							"Please fix the name in config!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))
@@ -135,6 +136,9 @@ public class ItemSerialization {
 				im.setOwner(itemAttribute[1]);
 				is.setItemMeta(im);
 			}
+		}
+		if(!createdItemStack) {
+			is = new ItemStack(Material.AIR);
 		}
 		return is;
 	}
@@ -224,10 +228,10 @@ public class ItemSerialization {
 							.getByKey(key),
 							Integer.valueOf(itemAttribute[2]).intValue());
 				} else {
-					ChatUtils.sendWarning(
+					ChatUtils.sendToConsole(
 							"Wrong enchantment name: "
 									+ itemAttribute[1]);
-					ChatUtils.sendWarning(
+					ChatUtils.sendToConsole(
 							"Please fix the name in database or add the plugin!");
 				}
 			} else if ((itemAttribute[0].equals("lore"))

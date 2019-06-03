@@ -12,8 +12,9 @@ public abstract class Database {
 	public ColdStorage plugin;
 	Connection connection;
 	// The name of the table we created back in SQLite class.
-	public String table = "cold_storage";
+	public String table = "storages";
 	public int tokens = 0;
+	private boolean newInitialized = false;
 
 	public Database(ColdStorage instance) {
 		plugin = instance;
@@ -22,6 +23,10 @@ public abstract class Database {
 	public abstract Connection getSQLConnection();
 
 	public abstract void load();
+	
+	public abstract void addDefault();
+	
+	public abstract void migrateTables();
 
 	public void initialize() {
 		connection = getSQLConnection();
@@ -34,7 +39,15 @@ public abstract class Database {
 		} catch (SQLException ex) {
 			plugin.getLogger().log(Level.SEVERE,
 					"Unable to retreive connection", ex);
+			return;
 		}
+		
+		if(newInitialized) {
+			addDefault();
+		} else {
+			migrateTables();
+		}
+		
 	}
 	
 	public boolean hasRecord(String key, String table){
@@ -150,5 +163,13 @@ public abstract class Database {
 		} catch (SQLException ex) {
 			Error.close(plugin, ex);
 		}
+	}
+
+	public boolean isNewInitialized() {
+		return newInitialized;
+	}
+
+	public void setNewInitialized(boolean newInitialized) {
+		this.newInitialized = newInitialized;
 	}
 }

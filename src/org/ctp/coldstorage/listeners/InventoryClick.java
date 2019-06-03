@@ -1,272 +1,84 @@
 package org.ctp.coldstorage.listeners;
 
-import java.util.HashMap;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.ctp.coldstorage.handlers.ColdStorageInventory;
-import org.ctp.coldstorage.handlers.ColdStorageInventory.Screen;
-import org.ctp.coldstorage.utils.ChatUtils;
-import org.ctp.coldstorage.utils.InventoryUtilities;
-import org.ctp.coldstorage.utils.Storage;
-import org.ctp.coldstorage.utils.StorageList;
-import org.ctp.coldstorage.utils.config.ConfigUtilities;
-import org.ctp.coldstorage.utils.config.ItemSerialization;
-import org.ctp.coldstorage.utils.exception.ColdStorageOverMaxException;
+import org.ctp.coldstorage.inventory.Anvilable;
+import org.ctp.coldstorage.inventory.ColdStorageInventory;
+import org.ctp.coldstorage.inventory.admin.AdminList;
+import org.ctp.coldstorage.inventory.admin.EditStorageType;
+import org.ctp.coldstorage.inventory.admin.EditStorageTypeList;
+import org.ctp.coldstorage.inventory.admin.EditTypePermissions;
+import org.ctp.coldstorage.inventory.admin.ListGlobalPermissions;
+import org.ctp.coldstorage.inventory.admin.ListPermissions;
+import org.ctp.coldstorage.inventory.admin.PlayerList;
+import org.ctp.coldstorage.inventory.admin.ViewGlobalPermission;
+import org.ctp.coldstorage.inventory.admin.ViewPermission;
+import org.ctp.coldstorage.inventory.draft.DraftList;
+import org.ctp.coldstorage.inventory.draft.StorageTypeList;
+import org.ctp.coldstorage.inventory.draft.ViewDraft;
+import org.ctp.coldstorage.inventory.storage.EditChests;
+import org.ctp.coldstorage.inventory.storage.ListStorage;
+import org.ctp.coldstorage.inventory.storage.ViewStorage;
+import org.ctp.coldstorage.utils.inventory.InventoryClickUtils;
+import org.ctp.coldstorage.utils.inventory.InventoryUtils;
 
 public class InventoryClick implements Listener{
-	
+
 	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event){
+	public void onInventoryClick(InventoryClickEvent event) {
 		Player player = null;
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();
 		} else {
 			return;
 		}
-		ColdStorageInventory csInv = InventoryUtilities.getInventory(player);
+		ColdStorageInventory csInv = InventoryUtils.getInventory(player);
 		
 		if(csInv != null) {
-			if(csInv.isEditing())
-				return;
+			if(csInv instanceof Anvilable) {
+				if(((Anvilable) csInv).isEditing()) {
+					return;
+				}
+			}
 			Inventory inv = event.getClickedInventory();
-			Inventory openedInv = event.getInventory();
 			if (inv == null)
 				return;
 			event.setCancelled(true);
-						
-			if(csInv.getScreen() == Screen.LIST) {
-				StorageList storageList = StorageList.getList(player);
-				if(storageList == null) {
-					return;
-				}
-				if(inv.equals(openedInv)){
-					switch(event.getSlot()){
-						case 45:
-							if(openedInv.getItem(45) != null && openedInv.getItem(45).getType() == Material.ARROW) {
-								csInv.listColdStorage(storageList.getPage() - 1);
-							}
-							break;
-						case 53:
-							if(openedInv.getItem(53) != null && openedInv.getItem(53).getType() == Material.ARROW) {
-								csInv.listColdStorage(storageList.getPage() + 1);
-							}
-							break;
-						case 49:
-							if(openedInv.getItem(49) != null && openedInv.getItem(49).getType() == Material.PAPER) {
-								csInv.selectColdStorageType();
-							}
-							break;
-						case 40:
-							if(openedInv.getItem(40) != null && openedInv.getItem(40).getType() == Material.COBBLESTONE) {
-								csInv.insertAll();
-							}
-							break;
-						case 47:
-							if(openedInv.getItem(47) != null && openedInv.getItem(47).getType() == Material.PAPER) {
-								csInv.listEditColdStorage(storageList.getPage());
-							}
-							break;
-						case 51:
-							if(openedInv.getItem(51) != null && openedInv.getItem(51).getType() == Material.BARRIER) {
-								csInv.listDeleteColdStorage(storageList.getPage());
-							}
-							break;
-						
-					}
-					if(event.getSlot() < 36) {
-						ItemStack item = openedInv.getItem(event.getSlot());
-						if(item != null && item.getType() != Material.AIR) {
-							csInv.openColdStorage(item, null);
-						}
-					}
-				}
-			} else if(csInv.getScreen() == Screen.EDIT) {
-				StorageList storageList = StorageList.getList(player);
-				if(storageList == null) {
-					return;
-				}
-				if(inv.equals(openedInv)){
-					switch(event.getSlot()){
-						case 45:
-							if(openedInv.getItem(45) != null && openedInv.getItem(45).getType() == Material.ARROW) {
-								csInv.listEditColdStorage(storageList.getPage() - 1);
-							}
-							break;
-						case 53:
-							if(openedInv.getItem(53) != null && openedInv.getItem(53).getType() == Material.ARROW) {
-								csInv.listEditColdStorage(storageList.getPage() + 1);
-							}
-							break;
-						case 39:
-							if(openedInv.getItem(39) != null && openedInv.getItem(39).getType() == Material.BOOK) {
-								csInv.listColdStorage(storageList.getPage());
-							}
-							break;
-						case 41:
-							if(openedInv.getItem(41) != null && openedInv.getItem(41).getType() == Material.BARRIER) {
-								csInv.listDeleteColdStorage(storageList.getPage());
-							}
-						
-					}
-					if(event.getSlot() < 36) {
-						ItemStack item = openedInv.getItem(event.getSlot());
-						if(item != null && item.getType() != Material.AIR) {
-							csInv.editColdStorage(item);
-						}
-					}
-				}
-			} else if(csInv.getScreen() == Screen.DELETE) {
-				StorageList storageList = StorageList.getList(player);
-				if(storageList == null) {
-					return;
-				}
-				if(inv.equals(openedInv)){
-					switch(event.getSlot()){
-						case 45:
-							if(openedInv.getItem(45) != null && openedInv.getItem(45).getType() == Material.ARROW) {
-								csInv.listDeleteColdStorage(storageList.getPage() - 1);
-							}
-							break;
-						case 53:
-							if(openedInv.getItem(53) != null && openedInv.getItem(53).getType() == Material.ARROW) {
-								csInv.listDeleteColdStorage(storageList.getPage() + 1);
-							}
-							break;
-						case 39:
-							if(openedInv.getItem(39) != null && openedInv.getItem(39).getType() == Material.PAPER) {
-								csInv.listEditColdStorage(storageList.getPage());
-							}
-							break;
-						case 41:
-							if(openedInv.getItem(41) != null && openedInv.getItem(41).getType() == Material.BOOK) {
-								csInv.listColdStorage(storageList.getPage());
-							}
-						
-					}
-					if(event.getSlot() < 36) {
-						ItemStack item = openedInv.getItem(event.getSlot());
-						if(item != null && item.getType() != Material.AIR) {
-							csInv.deleteColdStorage(item);
-						}
-					}
-				}
-			} else if (csInv.getScreen() == Screen.TYPE) {
-				event.setCancelled(true);
-				ItemStack item = event.getCurrentItem();
-				if(item == null) {
-					ChatUtils.sendMessage(player, "Please select a valid item!");
-				}
-				csInv.createColdStorage(item);
-			} else if (csInv.getScreen() == Screen.OPEN) {
-				event.setCancelled(true);
-				if(!inv.equals(openedInv)){
-					ItemStack item = event.getCurrentItem();
-					ItemStack storageItem = openedInv.getItem(4);
-					String id = csInv.getUnique();
-					if(storageItem != null && item != null) {
-						if(storageItem.getType().equals(item.getType())) {
-							String meta = ItemSerialization.itemToData(item);
-							Storage storage = Storage.getStorage(player, id);
-							String storageMeta = storage.getMeta();
-							if(meta.equals(storageMeta)) {
-								ItemStack replace = new ItemStack(Material.AIR);
-								int newAmount = storage.getAmount() + item.getAmount();
-								if(newAmount > ConfigUtilities.MAX_STORAGE_SIZE) {
-									if(newAmount - ConfigUtilities.MAX_STORAGE_SIZE > item.getAmount()) {
-										replace = item;
-										newAmount = storage.getAmount();
-									} else {
-										replace = item.clone();
-										replace.setAmount(newAmount - ConfigUtilities.MAX_STORAGE_SIZE);
-										newAmount = ConfigUtilities.MAX_STORAGE_SIZE;
-									}
-									ChatUtils.sendMessage(player, "Item limit reached!");
-								}
-								storage.setAmount(newAmount);
-								storage.updateStorage(player);
-								inv.setItem(event.getSlot(), replace);
-								csInv.openColdStorage(storageItem, id);
-							} else {
-								ChatUtils.sendMessage(player, "Item must have matching metadata!");
-							}
-						} else {
-							ChatUtils.sendMessage(player, "Not a valid item!");
-						}
-					}
-				} else {
-					if(event.getSlot() == 18) {
-						ItemStack item = event.getCurrentItem();
-						if(item.getType().equals(Material.ARROW)) {
-							StorageList storageList = StorageList.getList(player);
-							if(storageList == null) {
-								player.closeInventory();
-							} else {
-								csInv.listColdStorage(storageList.getPage());
-							}
-						}
-					} else {
-						ItemStack item = event.getCurrentItem();
-						ItemStack storageItem = openedInv.getItem(4);
-						if(item != null) {
-							String id = csInv.getUnique();
-							Storage storage = Storage.getStorage(player, id);
-							int amount = storageItem.getMaxStackSize();
-							ItemStack itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
-							HashMap<Integer, ItemStack> leftOver;
-							switch (event.getSlot()){
-							case 4:
-								if(storage.getAmount() < amount) {
-									amount = storage.getAmount();
-									itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
-								}
-								leftOver = player.getInventory().addItem(itemAdd);
-								if (!leftOver.isEmpty()) {
-						            amount -= leftOver.get(0).getAmount();
-						        }
-								storage.setAmount(storage.getAmount() - amount);
-								break;
-							case 12:
-								try {
-									amount = InventoryUtilities.maxRemoveFromInventory(storage.getAmount(), player, itemAdd);
-								} catch (ColdStorageOverMaxException ex) {
-									ChatUtils.sendMessage(player, ex.getMessage());
-									return;
-								}
-								itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
-								player.getInventory().removeItem(itemAdd);
-								storage.setAmount(storage.getAmount() + amount);
-								break;
-							case 14:
-								amount = InventoryUtilities.maxAddToInventory(player, itemAdd);
-								if(storage.getAmount() < amount) {
-									amount = storage.getAmount();
-								}
-								itemAdd = ItemSerialization.dataToItem(storage.getMaterial(), amount, storage.getMeta());
-								int left = InventoryUtilities.addItems(player, itemAdd);
-								if (left > 0) {
-						            amount -= left;
-						        }
-								storage.setAmount(storage.getAmount() - amount);
-								break;
-							}
-							
-							storage.updateStorage(player);
-							csInv.openColdStorage(storageItem, id);
-						}
-					}
-				}
-			} else {
-				event.setCancelled(true);
-				Bukkit.getConsoleSender().sendMessage("Bad screen: " + csInv.getScreen());
+			
+			if(csInv instanceof ListStorage) {
+				InventoryClickUtils.viewStorageList(event, player, (ListStorage) csInv);
+			} else if (csInv instanceof ViewStorage) {
+				InventoryClickUtils.viewStorage(event, player, (ViewStorage) csInv);
+			} else if (csInv instanceof DraftList) {
+				InventoryClickUtils.viewDraftList(event, player, (DraftList) csInv);
+			} else if (csInv instanceof ViewDraft) {
+				InventoryClickUtils.viewDraft(event, player, (ViewDraft) csInv);
+			} else if (csInv instanceof StorageTypeList) {
+				InventoryClickUtils.storageTypeList(event, player, (StorageTypeList) csInv);
+			} else if (csInv instanceof EditStorageTypeList) {
+				InventoryClickUtils.editStorageTypeList(event, player, (EditStorageTypeList) csInv);
+			} else if (csInv instanceof EditStorageType) {
+				InventoryClickUtils.editStorageType(event, player, (EditStorageType) csInv);
+			} else if (csInv instanceof EditTypePermissions) {
+				InventoryClickUtils.editTypePermissions(event, player, (EditTypePermissions) csInv);
+			} else if (csInv instanceof ListPermissions) {
+				InventoryClickUtils.listPermissions(event, player, (ListPermissions) csInv);
+			} else if (csInv instanceof ViewPermission) {
+				InventoryClickUtils.viewPermission(event, player, (ViewPermission) csInv);
+			} else if (csInv instanceof AdminList) {
+				InventoryClickUtils.adminList(event, player, (AdminList) csInv);
+			} else if (csInv instanceof ListGlobalPermissions) {
+				InventoryClickUtils.listGlobalPermissions(event, player, (ListGlobalPermissions) csInv);
+			} else if (csInv instanceof ViewGlobalPermission) {
+				InventoryClickUtils.viewGlobalPermission(event, player, (ViewGlobalPermission) csInv);
+			} else if (csInv instanceof EditChests) {
+				InventoryClickUtils.editChests(event, player, (EditChests) csInv);
+			} else if (csInv instanceof PlayerList) {
+				InventoryClickUtils.playerList(event, player, (PlayerList) csInv);
 			}
 		}
 	}
-
 }

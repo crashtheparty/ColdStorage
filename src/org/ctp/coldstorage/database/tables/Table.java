@@ -278,10 +278,10 @@ public class Table {
 					if(!columnsInTable.contains(column.getName())){
 						String statement = "ALTER TABLE " + name + " ADD COLUMN `" + column.getName() + "` " + conversions.get(column.getType()) + " DEFAULT " + column.getDefaultValue();
 						if(column.getType().equals("autoint")) {
-							ChatUtils.sendWarning("Can't add auto increment value to existing table: skipping.");
+							ChatUtils.sendToConsole("Can't add auto increment value to existing table: skipping.");
 							continue;
 						}
-						ChatUtils.sendInfo(statement);
+						ChatUtils.sendToConsole(statement);
 						Statement st = connection.createStatement();
 						st.executeUpdate(statement);
 						st.close();
@@ -306,7 +306,7 @@ public class Table {
 					}else {
 						statement = statement.substring(0, statement.length() - 1) + ")";
 					}
-					ChatUtils.sendInfo(statement);
+					ChatUtils.sendToConsole(statement);
 					try{
 						Statement st = connection.createStatement();
 						st.executeUpdate(statement);
@@ -315,7 +315,7 @@ public class Table {
 						e.printStackTrace();
 					}
 				}else {
-					ChatUtils.sendWarning("Failed to add table " + name + ": primary keys undefined.");
+					ChatUtils.sendToConsole("Failed to add table " + name + ": primary keys undefined.");
 				}
 			}
 		}catch(SQLException ex){
@@ -338,7 +338,7 @@ public class Table {
 					}else {
 						statement = statement.substring(0, statement.length() - 1) + ")";
 					}
-					ChatUtils.sendWarning(statement);
+					ChatUtils.sendToConsole(statement);
 					try{
 						Statement st = connection.createStatement();
 						st.executeUpdate(statement);
@@ -347,7 +347,7 @@ public class Table {
 						e.printStackTrace();
 					}
 				}else {
-					ChatUtils.sendWarning("Failed to add table " + name + ": primary keys undefined.");
+					ChatUtils.sendToConsole("Failed to add table " + name + ": primary keys undefined.");
 				}
 			}else{
 				ex.printStackTrace();

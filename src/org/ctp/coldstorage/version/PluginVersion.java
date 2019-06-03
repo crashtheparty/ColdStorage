@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.ctp.coldstorage.version.Version.VersionType;
 
 public class PluginVersion {
 	

@@ -4,41 +4,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.ctp.coldstorage.handlers.ColdStorageInventory;
-import org.ctp.coldstorage.handlers.ColdStorageInventory.Screen;
-import org.ctp.coldstorage.utils.ChatUtils;
-import org.ctp.coldstorage.utils.InventoryUtilities;
-import org.ctp.coldstorage.utils.Storage;
+import org.ctp.coldstorage.inventory.Anvilable;
+import org.ctp.coldstorage.inventory.ColdStorageInventory;
+import org.ctp.coldstorage.utils.inventory.InventoryUtils;
 
 public class ChatMessage implements Listener{
-	
+
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		ColdStorageInventory inv = InventoryUtilities.getInventory(player);
-		if(inv != null) {
-			if(inv.getScreen() == Screen.EDIT) {
-				event.setCancelled(true);
-				String chat = event.getMessage();
-				int order = 0;
-				try {
-					order = Integer.parseInt(chat);
-				} catch (Exception e) {
-					ChatUtils.sendMessage(player, "Entered order not a number - set to 0.");
+		ColdStorageInventory inv = InventoryUtils.getInventory(player);
+		if (inv != null) {
+			event.setCancelled(true);
+			if (inv instanceof Anvilable) {
+				Anvilable anvil = (Anvilable) inv;
+				if (anvil.isChoice()) {
+					anvil.setChoice(event.getMessage());
+				} else if (anvil.isEditing()) {
+					anvil.setItemName(event.getMessage());
 				}
-				Storage storage = Storage.getStorage(inv.getPlayer(), inv.getUnique());
-				if(storage != null) {
-					storage.setOrderBy(order);
-					storage.updateStorage(player);
-					ChatUtils.sendMessage(player, "Updated the order.");
-				} else {
-					ChatUtils.sendMessage(player, "Issue with storages - none selected.");
-				}
-				inv.listEditColdStorage();
-			} else {
-				InventoryUtilities.removeInventory(player);
 			}
 		}
 	}
-
 }
