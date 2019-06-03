@@ -15,7 +15,6 @@ import org.ctp.coldstorage.inventory.Anvilable;
 import org.ctp.coldstorage.inventory.ColdStorageInventory;
 import org.ctp.coldstorage.nms.AnvilGUI;
 import org.ctp.coldstorage.permissions.Permission;
-import org.ctp.coldstorage.storage.StorageType;
 import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.DatabaseUtils;
 import org.ctp.coldstorage.utils.inventory.InventoryUtils;
@@ -83,8 +82,9 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 
 	@Override
 	public void setInventory() {
+		List<Permission> permissions = DatabaseUtils.getGlobalPermissions();
 		Inventory inv = null;
-		if(PAGING > StorageType.getAll().size() && page == 1) {
+		if(PAGING > permissions.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.listglobalpermissions.title"));
 		} else {
 			HashMap<String, Object> codes = getCodes();
@@ -92,7 +92,6 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(codes, "inventory.listglobalpermissions.title_paginated"));
 		}
 		inv = open(inv);
-		List<Permission> permissions = DatabaseUtils.getGlobalPermissions();
 		
 		for(int i = 0; i < PAGING; i++) {
 			int permissionNum = i + (PAGING * (page - 1));
@@ -154,7 +153,7 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 		if(permissions.size() > num) {
 			Permission permission = permissions.get(num);
 			close(false);
-			InventoryUtils.addInventory(show, new ViewPermission(player, admin, permission));
+			InventoryUtils.addInventory(show, new ViewGlobalPermission(player, admin, permission));
 			return;
 		}
 		ChatUtils.sendMessage(show, ChatUtils.getMessage(getCodes(), "exceptions.permission_does_not_exist"));
@@ -237,7 +236,7 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 			setInventory();
 			return;
 		}
-		if(DatabaseUtils.getPermission(check) != null) {
+		if(DatabaseUtils.getGlobalPermission(check) != null) {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%permission%", name);
 			ChatUtils.sendMessage(show, ChatUtils.getMessage(codes, "exceptions.permission_exists"));
@@ -246,8 +245,8 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 		}
 		close(false);
 		Permission permission = new Permission(check, 0, 0);
-		DatabaseUtils.addPermission(permission);
-		InventoryUtils.addInventory(show, new ViewPermission(player, admin, permission));
+		DatabaseUtils.addGlobalPermission(permission);
+		InventoryUtils.addInventory(show, new ViewGlobalPermission(player, admin, permission));
 	}
 
 	@Override

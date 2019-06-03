@@ -185,6 +185,8 @@ public class LanguageFiles {
 				(ChatColor.DARK_GREEN + "Create New Storage Type").replace("§", "&"));
 		englishUS.addDefault("inventory.create_remove.create_permission",
 				(ChatColor.DARK_GREEN + "Create New Permission").replace("§", "&"));
+		englishUS.addDefault("inventory.create_remove.create_global_permission",
+				(ChatColor.DARK_GREEN + "Create New Global Permission").replace("§", "&"));
 		englishUS.addDefault("inventory.create_remove.remove_storage",
 				(ChatColor.DARK_RED + "Delete Storage").replace("§", "&"));
 		englishUS.addDefault("inventory.create_remove.delete_draft",

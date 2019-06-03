@@ -295,7 +295,7 @@ public class DatabaseUtils {
 	public static void updateGlobalPermission(Permission permission) {
 		Table table = ColdStorage.getPlugin().getDb().getTable(GlobalPermissionsTable.class);
 		GlobalPermissionsTable permissionsTable = null;
-		if(table instanceof PermissionsTable) {
+		if(table instanceof GlobalPermissionsTable) {
 			permissionsTable = (GlobalPermissionsTable) table;
 		}
 		permissionsTable.setPermission(permission);

@@ -1,6 +1,5 @@
 package org.ctp.coldstorage.utils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,8 +10,6 @@ import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -116,56 +113,75 @@ public class ChatUtils {
 		player.sendMessage(starter() + message);
 	}
 	
-    /**
-     * Hides text in color codes
-     *
-     * @param text The text to hide
-     * @return The hidden text
-     */
-    @Nonnull
-    public static String hideText(@Nonnull String text) {
-        Objects.requireNonNull(text, "text can not be null!");
+	/**
+	 * Hides text in color codes
+	 *
+	 * @param text
+	 *            The text to hide
+	 * @return The hidden text
+	 */
+	@Nonnull
+	public static String hideText(@Nonnull String text) {
+		Objects.requireNonNull(text, "text can not be null!");
 
-        StringBuilder output = new StringBuilder();
+		StringBuilder output = new StringBuilder();
 
-        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
-        String hex = Hex.encodeHexString(bytes);
+		String hex = asciiToHex(text);
 
-        for (char c : hex.toCharArray()) {
-            output.append(ChatColor.COLOR_CHAR).append(c);
-        }
+		for(char c: hex.toCharArray()) {
+			output.append(ChatColor.COLOR_CHAR).append(c);
+		}
 
-        return output.toString();
-    }
+		return output.toString();
+	}
 
-    /**
-     * Reveals the text hidden in color codes
-     *
-     * @param text The hidden text
-     * @throws IllegalArgumentException if an error occurred while decoding.
-     * @return The revealed text
-     */
-    @Nonnull
-    public static String revealText(@Nonnull String text) {
-        Objects.requireNonNull(text, "text can not be null!");
+	/**
+	 * Reveals the text hidden in color codes
+	 *
+	 * @param text
+	 *            The hidden text
+	 * @throws IllegalArgumentException
+	 *             if an error occurred while decoding.
+	 * @return The revealed text
+	 */
+	@Nonnull
+	public static String revealText(@Nonnull String text) {
+		Objects.requireNonNull(text, "text can not be null!");
 
-        if (text.isEmpty()) {
-            return text;
-        }
+		if (text.isEmpty()) {
+			return text;
+		}
 
-        char[] chars = text.toCharArray();
+		char[] chars = text.toCharArray();
 
-        char[] hexChars = new char[chars.length / 2];
+		char[] hexChars = new char[chars.length / 2];
 
-        IntStream.range(0, chars.length)
-                .filter(value -> value % 2 != 0)
-                .forEach(value -> hexChars[value / 2] = chars[value]);
+		IntStream.range(0, chars.length).filter(value -> value % 2 != 0)
+				.forEach(value -> hexChars[value / 2] = chars[value]);
+		
+		String newChars = "";
+		for(char c : hexChars) {
+			newChars += c;
+		}
 
-        try {
-            return new String(Hex.decodeHex(hexChars), StandardCharsets.UTF_8);
-        } catch (DecoderException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Couldn't decode text", e);
-        }
-    }
+		return new String(hexToASCII(newChars));
+	}
+
+	private static String asciiToHex(String asciiValue) {
+		char[] chars = asciiValue.toCharArray();
+		StringBuffer hex = new StringBuffer();
+		for(int i = 0; i < chars.length; i++) {
+			hex.append(Integer.toHexString((int) chars[i]));
+		}
+		return hex.toString();
+	}
+
+	private static String hexToASCII(String hexValue) {
+		StringBuilder output = new StringBuilder("");
+		for(int i = 0; i < hexValue.length(); i += 2) {
+			String str = hexValue.substring(i, i + 2);
+			output.append((char) Integer.parseInt(str, 16));
+		}
+		return output.toString();
+	}
 }

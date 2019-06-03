@@ -15,7 +15,6 @@ import org.ctp.coldstorage.inventory.Anvilable;
 import org.ctp.coldstorage.inventory.ColdStorageInventory;
 import org.ctp.coldstorage.nms.AnvilGUI;
 import org.ctp.coldstorage.permissions.Permission;
-import org.ctp.coldstorage.storage.StorageType;
 import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.DatabaseUtils;
 import org.ctp.coldstorage.utils.inventory.InventoryUtils;
@@ -83,8 +82,9 @@ public class ListPermissions implements ColdStorageInventory, Anvilable{
 
 	@Override
 	public void setInventory() {
+		List<Permission> permissions = DatabaseUtils.getPermissions();
 		Inventory inv = null;
-		if(PAGING > StorageType.getAll().size() && page == 1) {
+		if(PAGING > permissions.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.listpermissions.title"));
 		} else {
 			HashMap<String, Object> codes = getCodes();
@@ -92,7 +92,6 @@ public class ListPermissions implements ColdStorageInventory, Anvilable{
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(codes, "inventory.listpermissions.title_paginated"));
 		}
 		inv = open(inv);
-		List<Permission> permissions = DatabaseUtils.getPermissions();
 		
 		for(int i = 0; i < PAGING; i++) {
 			int permissionNum = i + (PAGING * (page - 1));

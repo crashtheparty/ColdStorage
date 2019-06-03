@@ -66,6 +66,7 @@ public class Draft extends Cache{
 		boolean hasPermission = false;
 		for(Permission permission : permissions) {
 			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
+				hasPermission = true;
 				permissionNum = permission.getNumStorages();
 			}
 		}
@@ -86,6 +87,7 @@ public class Draft extends Cache{
 		int permissionNum = -1;
 		for(Permission permission : permissions) {
 			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
+				hasPermission = true;
 				permissionNum = permission.getNumStorages();
 			}
 		}
@@ -113,6 +115,7 @@ public class Draft extends Cache{
 		int permissionNum = -1;
 		for(Permission permission : permissions) {
 			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
+				hasPermission = true;
 				permissionNum = permission.getNumStorages();
 			}
 		}
@@ -131,6 +134,7 @@ public class Draft extends Cache{
 		int permissionNum = -1;
 		for(Permission permission : permissions) {
 			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
+				hasPermission = true;
 				permissionNum = permission.getNumStorages();
 			}
 		}
