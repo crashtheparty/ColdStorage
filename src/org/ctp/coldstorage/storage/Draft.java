@@ -111,12 +111,13 @@ public class Draft extends Cache{
 				totalType ++;
 			}
 		}
-		List<Permission> permissions = DatabaseUtils.getPermissions();
+		List<String> permissions = DatabaseUtils.getStringPermissions(getStorageType());
 		int permissionNum = -1;
-		for(Permission permission : permissions) {
-			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
+		for(String permission : permissions) {
+			if(getPlayer().getPlayer().hasPermission(permission)){
 				hasPermission = true;
-				permissionNum = permission.getNumStorages();
+				Permission perm = DatabaseUtils.getPermission(permission);
+				permissionNum = perm.getNumStorages();
 			}
 		}
 		if(!hasPermission) {
