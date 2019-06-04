@@ -61,13 +61,16 @@ public class Draft extends Cache{
 	}
 	
 	public String getMaxStorages() {
-		List<Permission> permissions = DatabaseUtils.getPermissions();
-		int permissionNum = -1;
 		boolean hasPermission = false;
-		for(Permission permission : permissions) {
-			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
-				hasPermission = true;
-				permissionNum = permission.getNumStorages();
+		List<String> permissions = DatabaseUtils.getStringPermissions(getStorageType());
+		int permissionNum = -1;
+		for(String permission : permissions) {
+			if(getPlayer().getPlayer().hasPermission(permission)){
+				Permission perm = DatabaseUtils.getPermission(permission);
+				if(perm != null) {
+					hasPermission = true;
+					permissionNum = perm.getNumStorages();
+				}
 			}
 		}
 		if(!hasPermission) {
@@ -115,9 +118,11 @@ public class Draft extends Cache{
 		int permissionNum = -1;
 		for(String permission : permissions) {
 			if(getPlayer().getPlayer().hasPermission(permission)){
-				hasPermission = true;
 				Permission perm = DatabaseUtils.getPermission(permission);
-				permissionNum = perm.getNumStorages();
+				if(perm != null) {
+					hasPermission = true;
+					permissionNum = perm.getNumStorages();
+				}
 			}
 		}
 		if(!hasPermission) {
@@ -131,12 +136,15 @@ public class Draft extends Cache{
 			return true;
 		}
 		boolean hasPermission = false;
-		List<Permission> permissions = DatabaseUtils.getPermissions();
+		List<String> permissions = DatabaseUtils.getStringPermissions(getStorageType());
 		int permissionNum = -1;
-		for(Permission permission : permissions) {
-			if(getPlayer().getPlayer().hasPermission(permission.getPermission())){
-				hasPermission = true;
-				permissionNum = permission.getNumStorages();
+		for(String permission : permissions) {
+			if(getPlayer().getPlayer().hasPermission(permission)){
+				Permission perm = DatabaseUtils.getPermission(permission);
+				if(perm != null) {
+					hasPermission = true;
+					permissionNum = perm.getNumStorages();
+				}
 			}
 		}
 		if(!hasPermission) {
