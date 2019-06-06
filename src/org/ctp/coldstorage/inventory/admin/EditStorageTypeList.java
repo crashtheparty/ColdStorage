@@ -156,7 +156,9 @@ public class EditStorageTypeList implements ColdStorageInventory, Anvilable{
 	@Override
 	public void close(boolean external) {
 		if(InventoryUtils.getInventory(show) != null) {
-			InventoryUtils.removeInventory(show);
+			if(!editing) {
+				InventoryUtils.removeInventory(show);
+			}
 			if(!external) {
 				show.closeInventory();
 			}

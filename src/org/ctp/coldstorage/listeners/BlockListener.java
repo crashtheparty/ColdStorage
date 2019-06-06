@@ -9,8 +9,8 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.utils.ChatUtils;
@@ -73,10 +73,10 @@ public class BlockListener implements Listener{
 	}
 	
 	@EventHandler
-	public void onBlockExplode(BlockExplodeEvent event) {
+	public void onEntityExplode(EntityExplodeEvent event) {
 		for(int i = event.blockList().size() - 1; i >= 0; i--) {
 			Block block = event.blockList().get(i);
-			if(block.getType() == Material.CHEST && DatabaseUtils.hasChest(event.getBlock())) {
+			if(block.getType() == Material.CHEST && DatabaseUtils.hasChest(block)) {
 				event.blockList().remove(i);
 			}
 		}

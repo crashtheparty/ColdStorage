@@ -67,7 +67,7 @@ public class Chest {
 	public void toggle(Storage storage, ChestType type, Player player) {
 		if(DatabaseUtils.getChestType(storage, this) == null) {
 			if(storage.getStorageType() != null) {
-				if(type == ChestType.EXPORT && storage.getStorageType().getMaxExport() <= DatabaseUtils.getChestTypes(ChestType.EXPORT).size()) {
+				if(type == ChestType.EXPORT && storage.getStorageType().getMaxExport() <= DatabaseUtils.getChestTypes(storage, ChestType.EXPORT).size()) {
 					if(storage.getStorageType().getMaxExport() == 0) {
 						ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.no_export"));
 						return;
@@ -75,7 +75,7 @@ public class Chest {
 					ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.too_many_export"));
 					return;
 				}
-				if(type == ChestType.IMPORT && storage.getStorageType().getMaxImport() <= DatabaseUtils.getChestTypes(ChestType.IMPORT).size()) {
+				if(type == ChestType.IMPORT && storage.getStorageType().getMaxImport() <= DatabaseUtils.getChestTypes(storage, ChestType.IMPORT).size()) {
 					if(storage.getStorageType().getMaxImport() == 0) {
 						ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.no_import"));
 						return;

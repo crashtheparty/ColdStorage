@@ -135,6 +135,9 @@ public class Draft extends Cache{
 		if(getPlayer().getPlayer() == null) {
 			return true;
 		}
+		if(this.getStorageType() == null) {
+			return true;
+		}
 		boolean hasPermission = false;
 		List<String> permissions = DatabaseUtils.getStringPermissions(getStorageType());
 		int permissionNum = -1;
