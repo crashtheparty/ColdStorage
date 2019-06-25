@@ -98,12 +98,12 @@ public class ListStorage implements ColdStorageInventory{
 			storages = new ArrayList<Cache>();
 		}
 		Inventory inv;
-		if(PAGING > storages.size() && page == 1) {
+		if(PAGING >= storages.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.storagelist.title"));
 		} else {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes("%page%", page), "inventory.storagelist.title_paginated"));
 		}
-		open(inv);
+		inv = open(inv);
 		for(int i = 0; i < PAGING; i++) {
 			int storageNum = i + (PAGING * (page - 1));
 			if(storages.size() <= storageNum) break;
@@ -181,6 +181,7 @@ public class ListStorage implements ColdStorageInventory{
 				}
 			}
 		}
+		setInventory();
 	}
 	
 	public void viewStorage(int slot) {
@@ -274,6 +275,41 @@ public class ListStorage implements ColdStorageInventory{
 	@Override
 	public boolean isOpening() {
 		return opening;
+	}
+
+	public void updateStorage(Storage storage) {
+		StorageList storageList = StorageList.getList(player);
+		storageList.update();
+		List<Cache> storages = storageList.getStorages();
+		if(storages == null) {
+			storages = new ArrayList<Cache>();
+		}
+		for(int i = 0; i < PAGING; i++) {
+			int storageNum = i + (PAGING * (page - 1));
+			if(storages.size() <= storageNum) break;
+			if(storages.get(storageNum) instanceof Storage) {
+				Storage s = (Storage) storages.get(storageNum);
+				if(s.getUnique().equals(storage.getUnique())) {
+					ItemStack storageItem = new ItemStack(storage.getMaterial());
+					ItemMeta storageItemMeta = storageItem.getItemMeta();
+					storageItemMeta.setDisplayName(ChatUtils.getMessage(getCodes("%name%", storage.getName()), "inventory.storagelist.name"));
+					List<String> lore = new ArrayList<String>();
+					boolean first = true;
+					lore.add(ChatUtils.getMessage(getCodes("%amount%", storage.getStoredAmount()), "inventory.storagelist.amount"));
+					lore.add(ChatUtils.getMessage(getCodes("%insert%", storage.canInsertAll()), "inventory.storagelist.insert"));
+					for(String meta : storage.getMeta().split(" ")) {
+						if(first) {
+							lore.add(ChatUtils.getMessage(getCodes("%meta%", meta), "inventory.storagelist.meta_first"));
+						} else {
+							lore.add(ChatUtils.getMessage(getCodes("%meta%", meta), "inventory.storagelist.meta"));
+						}
+					}
+					storageItemMeta.setLore(lore);
+					storageItem.setItemMeta(storageItemMeta);
+					inventory.setItem(i, storageItem);
+				}
+			}
+		}
 	}
 
 }

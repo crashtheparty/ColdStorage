@@ -85,7 +85,7 @@ public class EditStorageTypeList implements ColdStorageInventory, Anvilable{
 	public void setInventory() {
 		editing = false;
 		Inventory inv = null;
-		if(PAGING > StorageType.getAll().size() && page == 1) {
+		if(PAGING >= StorageType.getAll().size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.editstoragelist.title"));
 		} else {
 			HashMap<String, Object> titleCodes = getCodes();

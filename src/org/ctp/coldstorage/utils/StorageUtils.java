@@ -15,6 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.ctp.coldstorage.inventory.ColdStorageInventory;
+import org.ctp.coldstorage.inventory.storage.ListStorage;
 import org.ctp.coldstorage.inventory.storage.ViewStorage;
 import org.ctp.coldstorage.storage.ChestTypeRecord;
 import org.ctp.coldstorage.storage.Storage;
@@ -50,6 +51,10 @@ public class StorageUtils {
 									openedInv.setInventory();
 								}
 							}
+							if (openedInv instanceof ListStorage) {
+								ListStorage listStorage = (ListStorage) openedInv;
+								listStorage.updateStorage(storage);
+							}
 						}
 					}
 				}
@@ -77,6 +82,10 @@ public class StorageUtils {
 									viewStorage.setStorage(storage);
 									openedInv.setInventory();
 								}
+							}
+							if (openedInv instanceof ListStorage) {
+								ListStorage listStorage = (ListStorage) openedInv;
+								listStorage.updateStorage(storage);
 							}
 						}
 					}

@@ -104,7 +104,7 @@ public class EditChests implements ColdStorageInventory{
 		List<Chest> chests = DatabaseUtils.getChests(player);
 		HashMap<String, Object> codes = getCodes("%name%", storage.getName());
 		codes.put("%type%", chestType.name());
-		if(PAGING > chests.size() && page == 1) {
+		if(PAGING >= chests.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(codes, "inventory.editchests.title"));
 		} else {
 			codes.put("%page%", page);

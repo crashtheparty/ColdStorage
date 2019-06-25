@@ -87,7 +87,7 @@ public class PlayerList implements ColdStorageInventory{
 		if(players == null) {
 			players = new ArrayList<OfflinePlayer>();
 		}
-		if(PAGING > players.size() && page == 1) {
+		if(PAGING >= players.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.playerlist.title"));
 		} else {
 			HashMap<String, Object> titleCodes = getCodes();

@@ -92,7 +92,7 @@ public class StorageTypeList implements ColdStorageInventory{
 	@Override
 	public void setInventory() {
 		Inventory inv = null;
-		if(PAGING > StorageType.getAll().size() && page == 1) {
+		if(PAGING >= StorageType.getAll().size() && page == 1) {
 			inv = Bukkit.createInventory(null, 36, ChatUtils.getMessage(getCodes(), "inventory.storagetypelist.title"));
 		} else {
 			inv = Bukkit.createInventory(null, 36, ChatUtils.getMessage(getCodes("%page%", page), "inventory.storagetypelist.title_paginated"));

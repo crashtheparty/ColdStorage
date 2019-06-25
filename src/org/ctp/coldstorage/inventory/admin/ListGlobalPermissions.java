@@ -84,7 +84,7 @@ public class ListGlobalPermissions implements ColdStorageInventory, Anvilable{
 	public void setInventory() {
 		List<Permission> permissions = DatabaseUtils.getGlobalPermissions();
 		Inventory inv = null;
-		if(PAGING > permissions.size() && page == 1) {
+		if(PAGING >= permissions.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.listglobalpermissions.title"));
 		} else {
 			HashMap<String, Object> codes = getCodes();

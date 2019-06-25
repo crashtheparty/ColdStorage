@@ -98,14 +98,14 @@ public class DraftList implements ColdStorageInventory{
 			storages = new ArrayList<Cache>();
 		}
 		Inventory inv;
-		if(PAGING > storages.size() && page == 1) {
+		if(PAGING >= storages.size() && page == 1) {
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.draftlist.title"));
 		} else {
 			HashMap<String, Object> titleCodes = getCodes();
 			titleCodes.put("%page%", page);
 			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(titleCodes, "inventory.draftlist.title_paginated"));
 		}
-		open(inv);
+		inv = open(inv);
 		for(int i = 0; i < PAGING; i++) {
 			int storageNum = i + (PAGING * (page - 1));
 			if(storages.size() <= storageNum) break;
