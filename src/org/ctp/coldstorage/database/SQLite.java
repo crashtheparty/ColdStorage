@@ -122,7 +122,7 @@ public class SQLite extends Database {
 				while (rs.next()) {
 					ChatUtils.sendInfo("Amount: " + rs.getInt("amount"));
 					storages.add(new Storage(Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("player"))), 
-							rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), rs.getString("metadata"), 
+							rs.getString("storage_unique"), rs.getString("material"), rs.getString("metadata"), 
 							type.getType(), rs.getString("material"), rs.getInt("amount"), rs.getInt("order_by"), true));
 				}
 			} catch (SQLException ex) {

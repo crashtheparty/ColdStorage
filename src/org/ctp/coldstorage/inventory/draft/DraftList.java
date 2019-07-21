@@ -113,7 +113,7 @@ public class DraftList implements ColdStorageInventory{
 				Draft draft = (Draft) storages.get(storageNum);
 				
 				ItemStack storageItem = new ItemStack(draft.getMaterial());
-				if(storageItem.getType() == Material.AIR) storageItem.setType(Material.BARRIER);
+				if(storageItem.getType() == null || storageItem.getType() == Material.AIR) storageItem.setType(Material.BARRIER);
 				ItemMeta storageItemMeta = storageItem.getItemMeta();
 				HashMap<String, Object> nameCodes = getCodes();
 				nameCodes.put("%name%", draft.getName());

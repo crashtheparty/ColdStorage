@@ -3,13 +3,14 @@ package org.ctp.coldstorage.storage;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.ctp.coldstorage.utils.MaterialUtils;
 import org.ctp.coldstorage.utils.config.ItemSerialization;
 
 public abstract class Cache {
 
 	private OfflinePlayer player;
 	private StorageType storageType;
-	private String unique, meta, name, storageTypeString;
+	private String unique, meta, name, storageTypeString, materialName;
 	private Material material;
 	
 	public Cache(OfflinePlayer player, String unique, ItemStack item, StorageType storageType, String name) {
@@ -40,9 +41,15 @@ public abstract class Cache {
 		setName(name);
 	}
 	
-	public Cache(OfflinePlayer player, String unique, Material material, String meta, String storageType, String name) {
+	public Cache(OfflinePlayer player, String unique, String materialName, String meta, String storageType, String name) {
 		setPlayer(player);
 		setUnique(unique);
+		Material material = MaterialUtils.getMaterial(materialName);
+		if(material != null) {
+			setMaterial(material);
+		} else {
+			this.materialName = materialName;
+		}
 		setMaterial(material);
 		setMeta(meta);
 		setStorageType(storageType);
@@ -79,6 +86,9 @@ public abstract class Cache {
 	
 	public void setMaterial(Material material) {
 		this.material = material;
+		if(material != null) {
+			this.materialName = material.name();
+		}
 	}
 
 	public StorageType getStorageType() {
@@ -107,5 +117,9 @@ public abstract class Cache {
 
 	public String getStorageTypeString() {
 		return storageTypeString;
+	}
+
+	public String getMaterialName() {
+		return materialName;
 	}
 }

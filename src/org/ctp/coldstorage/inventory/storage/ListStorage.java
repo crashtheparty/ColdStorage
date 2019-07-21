@@ -110,7 +110,11 @@ public class ListStorage implements ColdStorageInventory{
 			if(storages.get(storageNum) instanceof Storage) {
 				Storage storage = (Storage) storages.get(storageNum);
 				
-				ItemStack storageItem = new ItemStack(storage.getMaterial());
+				Material m = storage.getMaterial();
+				if(m == null || m == Material.AIR) {
+					m = Material.BARRIER;
+				}
+				ItemStack storageItem = new ItemStack(m);
 				ItemMeta storageItemMeta = storageItem.getItemMeta();
 				storageItemMeta.setDisplayName(ChatUtils.getMessage(getCodes("%name%", storage.getName()), "inventory.storagelist.name"));
 				List<String> lore = new ArrayList<String>();

@@ -31,7 +31,7 @@ public class PriceUtils {
 			if(ColdStorage.getEconomy() != null) {
 				if(ColdStorage.getEconomy().getBalance(player) >= type.getVaultCost()) {
 					ColdStorage.getEconomy().withdrawPlayer(player, type.getVaultCost());
-					Storage storage = new Storage(cache.getPlayer(), cache.getUnique(), cache.getMaterial(), cache.getMeta(), cache.getStorageTypeString(),
+					Storage storage = new Storage(cache.getPlayer(), cache.getUnique(), cache.getMaterialName(), cache.getMeta(), cache.getStorageTypeString(),
 							cache.getName(), 0, 0, true);
 					DatabaseUtils.updateCache(player, storage);
 					return true;
@@ -40,7 +40,7 @@ public class PriceUtils {
 		} else {
 			if(hasItems(player, type.getItemCost())) {
 				player.getInventory().removeItem(type.getItemCost());
-				Storage storage = new Storage(cache.getPlayer(), cache.getUnique(), cache.getMaterial(), cache.getMeta(), cache.getStorageTypeString(),
+				Storage storage = new Storage(cache.getPlayer(), cache.getUnique(), cache.getMaterialName(), cache.getMeta(), cache.getStorageTypeString(),
 						cache.getName(), 0, 0, true);
 				DatabaseUtils.updateCache(player, storage);
 				return true;

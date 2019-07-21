@@ -186,6 +186,7 @@ public class ItemSerialization {
 	
 	@SuppressWarnings("deprecation")
 	public static ItemStack dataToItem(Material material, int amount, String metadata) {
+		if(material == null) return new ItemStack(Material.AIR);
 		ItemStack is = new ItemStack(material, amount);
 		Boolean createdItemStack = Boolean.valueOf(true);
 

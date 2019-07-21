@@ -101,10 +101,12 @@ public class ViewDraft implements ColdStorageInventory, Anvilable{
 		inv.setItem(12, name);
 		
 		ItemStack itemType = ItemSerialization.dataToItem(draft.getMaterial(), 1, draft.getMeta());
-		String item = itemType.getType().name();
-		if(itemType.getType() == Material.AIR) itemType.setType(Material.BARRIER);
+		if(draft.getMaterial() == null) {
+			itemType.setType(Material.BARRIER);
+		} else if(itemType.getType() == Material.AIR) itemType.setType(Material.BARRIER);
 		if(modifyItem) itemType.setType(Material.EMERALD);
 		ItemMeta itemTypeMeta = itemType.getItemMeta();
+		String item = draft.getMaterialName();
 		HashMap<String, Object> typeCodes = getCodes();
 		typeCodes.put("%item_type%", item);
 		itemTypeMeta.setDisplayName(ChatUtils.getMessage(typeCodes, "inventory.viewdraft.item_type"));

@@ -155,10 +155,13 @@ public class LanguageFiles {
 		englishUS.addDefault("exceptions.not_your_chest", (ChatColor.RED + "You cannot delete someone else's chests!").replace("§", "&"));
 		englishUS.addDefault("exceptions.chest_delete", (ChatColor.RED + "Issue with deleting chest, please talk to an admin.").replace("§", "&"));
 		englishUS.addDefault("exceptions.has_chest_types", (ChatColor.RED + "Cannot delete a chest that is currently in use!").replace("§", "&"));
+		englishUS.addDefault("exceptions.interact_event_cancelled", (ChatColor.RED + "Cannot claim this chest: event cancelled!").replace("§", "&"));
 		
 		englishUS.addDefault("info.true", "true");
 		englishUS.addDefault("info.false", "false");
 		englishUS.addDefault("info.free", "Free");
+		englishUS.addDefault("info.unknown", "Unknown");
+		englishUS.addDefault("info.bad_material", "Bad Material - Disabled");
 
 		englishUS.addDefault("inventory.click.item_set", "Set to %item%.");
 		englishUS.addDefault("inventory.click.canceled", "Canceled.");

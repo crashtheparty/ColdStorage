@@ -152,6 +152,7 @@ public class Configuration {
 	public void reload(CommandSender sender) {
 		try {
 			mainFile();
+			ColdStorage.getPlugin().getDb().migrateData();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -195,6 +196,7 @@ public class Configuration {
 				"Set to -1 for infinite"});
 		mainConfig.addDefault("default_permission_global", 10, new String[] {"If user has no permissions, this is the max number of storages they can use",
 				"Set to -1 for infinite"});
+		mainConfig.addDefault("migrate_material_names", false, new String[] {"Migrate material names between Minecraft versions"});
 		mainConfig.addDefault("use_comments", true, new String[] {"See helpful comments in this file"});
 		if (ColdStorage.hasVault()) {
 			mainConfig.addDefault("vault", true, new String[] {"Vault is installed. Default value is true."});

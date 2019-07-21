@@ -1,6 +1,5 @@
 package org.ctp.coldstorage.storage;
 
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,8 +15,8 @@ public class Storage extends Cache{
 		setCanInsertAll(true);
 	}
 	
-	public Storage(OfflinePlayer player, String unique, Material material, String meta, String storageType, String name, int storedAmount, int orderBy, boolean canInsertAll) {
-		super(player, unique, material, meta, storageType, name);
+	public Storage(OfflinePlayer player, String unique, String materialName, String meta, String storageType, String name, int storedAmount, int orderBy, boolean canInsertAll) {
+		super(player, unique, materialName, meta, storageType, name);
 		setOrderBy(orderBy);
 		setStoredAmount(storedAmount);
 		setCanInsertAll(canInsertAll);

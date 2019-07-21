@@ -21,8 +21,8 @@ public class Draft extends Cache{
 		super(player, unique, item, storageType, name);
 	}
 	
-	public Draft(OfflinePlayer player, String unique, Material material, String meta, String storageType, String name) {
-		super(player, unique, material, meta, storageType, name);
+	public Draft(OfflinePlayer player, String unique, String materialName, String meta, String storageType, String name) {
+		super(player, unique, materialName, meta, storageType, name);
 	}
 	
 	public List<String> getReasons(){

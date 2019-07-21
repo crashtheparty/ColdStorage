@@ -23,6 +23,7 @@ public class AnvilGUI {
 			case 5:
 			case 6:
 			case 7:
+			case 8:
 				AnvilGUI_v1_14_R1.createAnvil(player, anvil, choice);
 				break;
 			}

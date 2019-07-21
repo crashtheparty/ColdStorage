@@ -95,75 +95,85 @@ public class ViewStorage implements ColdStorageInventory, Anvilable{
 		inv = open(inv);
 		
 		ItemStack itemStack = ItemSerialization.dataToItem(storage.getMaterial(), 1, storage.getMeta());
-		ItemMeta meta = itemStack.getItemMeta();
-		meta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.take_stack"));
-		List<String> takeAllLore = new ArrayList<String>();
-		String maxAmount = storage.getStorageType() == null ? "Unknown" : "" + storage.getStorageType().getMaxAmountBase();
-		takeAllLore.addAll(ChatUtils.getMessages(getCodes(new HashMap<String, Object>() {{
-			put("%stored_amount%", storage.getStoredAmount()); put("%max_size%", maxAmount);
-		}}), "inventory.viewstorage.type_meta"));
-		boolean first = true;
-		for(String m : storage.getMeta().split(" ")) {
-			if(first) {
-				takeAllLore.add(ChatUtils.getMessage(getCodes("%meta%", m), "inventory.viewstorage.meta_first"));
-			} else {
-				takeAllLore.add(ChatUtils.getMessage(getCodes("%meta%", m), "inventory.viewstorage.meta"));
+		if(itemStack.getType() == Material.AIR) {
+			itemStack.setType(Material.BARRIER);
+			ItemMeta meta = itemStack.getItemMeta();
+			meta.setDisplayName(ChatUtils.getMessage(getCodes(), "info.bad_material"));
+			itemStack.setItemMeta(meta);
+			inv.setItem(4, itemStack);
+		} else {
+			ItemMeta meta = itemStack.getItemMeta();
+			meta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.take_stack"));
+			
+			List<String> takeAllLore = new ArrayList<String>();
+			String maxAmount = storage.getStorageType() == null ? ChatUtils.getMessage(getCodes(), "info.unknown") : "" + storage.getStorageType().getMaxAmountBase();
+			takeAllLore.addAll(ChatUtils.getMessages(getCodes(new HashMap<String, Object>() {{
+				put("%stored_amount%", storage.getStoredAmount()); put("%max_size%", maxAmount);
+			}}), "inventory.viewstorage.type_meta"));
+			boolean first = true;
+			
+			for(String m : storage.getMeta().split(" ")) {
+				if(first) {
+					takeAllLore.add(ChatUtils.getMessage(getCodes("%meta%", m), "inventory.viewstorage.meta_first"));
+				} else {
+					takeAllLore.add(ChatUtils.getMessage(getCodes("%meta%", m), "inventory.viewstorage.meta"));
+				}
 			}
+			meta.setLore(takeAllLore);
+			itemStack.setItemMeta(meta);
+			inv.setItem(4, itemStack);
+		
+			ItemStack fillInventory = new ItemStack(Material.DRAGON_BREATH);
+			ItemMeta fillInventoryMeta = fillInventory.getItemMeta();
+			fillInventoryMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.fill_inventory"));
+			fillInventory.setItemMeta(fillInventoryMeta);
+			inv.setItem(14, fillInventory);
+			
+			ItemStack emptyInventory = new ItemStack(Material.GLASS_BOTTLE);
+			ItemMeta emptyInventoryMeta = emptyInventory.getItemMeta();
+			emptyInventoryMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.empty_inventory"));
+			emptyInventoryMeta.setLore(Arrays.asList(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.empty_inventory_info")));
+			emptyInventory.setItemMeta(emptyInventoryMeta);
+			inv.setItem(12, emptyInventory);
+	
+			ItemStack importChest = new ItemStack(Material.CHEST);
+			ItemMeta importChestMeta = importChest.getItemMeta();
+			importChestMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.import_chest"));
+			importChestMeta.setLore(ChatUtils.getMessages(getCodes("%max_import%", 
+					storage.getStorageType() != null ? storage.getStorageType().getMaxImport() : 0), 
+					"inventory.viewstorage.edit_import_chest"));
+			importChest.setItemMeta(importChestMeta);
+			inv.setItem(29, importChest);
+			
+			ItemStack exportChest = new ItemStack(Material.HOPPER);
+			ItemMeta exportChestMeta = exportChest.getItemMeta();
+			exportChestMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.export_chest"));
+			exportChestMeta.setLore(ChatUtils.getMessages(getCodes("%max_export%", 
+					storage.getStorageType() != null ? storage.getStorageType().getMaxExport() : 0), 
+					"inventory.viewstorage.edit_export_chest"));
+			exportChest.setItemMeta(exportChestMeta);
+			inv.setItem(33, exportChest);
+			
+			ItemStack editName = new ItemStack(Material.NAME_TAG);
+			ItemMeta editNameMeta = editName.getItemMeta();
+			editNameMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.edit_name"));
+			editName.setItemMeta(editNameMeta);
+			inv.setItem(31, editName);
+			
+			ItemStack editOrder = new ItemStack(Material.PAPER);
+			ItemMeta editOrderMeta = editOrder.getItemMeta();
+			editOrderMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.edit_display_order"));
+			editOrderMeta.setLore(ChatUtils.getMessages(getCodes("%order%", storage.getOrderBy()), "inventory.viewstorage.display_order_meta"));
+			editOrder.setItemMeta(editOrderMeta);
+			inv.setItem(30, editOrder);
+			
+			ItemStack editInsertAll = new ItemStack(Material.COBBLESTONE);
+			ItemMeta editInsertAllMeta = editInsertAll.getItemMeta();
+			editInsertAllMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.toggle_insert_all"));
+			editInsertAllMeta.setLore(ChatUtils.getMessages(getCodes("%insert_all%", storage.canInsertAll()), "inventory.viewstorage.insert_all_meta"));
+			editInsertAll.setItemMeta(editInsertAllMeta);
+			inv.setItem(32, editInsertAll);
 		}
-		meta.setLore(takeAllLore);
-		itemStack.setItemMeta(meta);
-		inv.setItem(4, itemStack);
-		
-		ItemStack fillInventory = new ItemStack(Material.DRAGON_BREATH);
-		ItemMeta fillInventoryMeta = fillInventory.getItemMeta();
-		fillInventoryMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.fill_inventory"));
-		fillInventory.setItemMeta(fillInventoryMeta);
-		inv.setItem(14, fillInventory);
-		
-		ItemStack emptyInventory = new ItemStack(Material.GLASS_BOTTLE);
-		ItemMeta emptyInventoryMeta = emptyInventory.getItemMeta();
-		emptyInventoryMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.empty_inventory"));
-		emptyInventoryMeta.setLore(Arrays.asList(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.empty_inventory_info")));
-		emptyInventory.setItemMeta(emptyInventoryMeta);
-		inv.setItem(12, emptyInventory);
-
-		ItemStack importChest = new ItemStack(Material.CHEST);
-		ItemMeta importChestMeta = importChest.getItemMeta();
-		importChestMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.import_chest"));
-		importChestMeta.setLore(ChatUtils.getMessages(getCodes("%max_import%", 
-				storage.getStorageType() != null ? storage.getStorageType().getMaxImport() : 0), 
-				"inventory.viewstorage.edit_import_chest"));
-		importChest.setItemMeta(importChestMeta);
-		inv.setItem(29, importChest);
-		
-		ItemStack exportChest = new ItemStack(Material.HOPPER);
-		ItemMeta exportChestMeta = exportChest.getItemMeta();
-		exportChestMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.export_chest"));
-		exportChestMeta.setLore(ChatUtils.getMessages(getCodes("%max_export%", 
-				storage.getStorageType() != null ? storage.getStorageType().getMaxExport() : 0), 
-				"inventory.viewstorage.edit_export_chest"));
-		exportChest.setItemMeta(exportChestMeta);
-		inv.setItem(33, exportChest);
-		
-		ItemStack editName = new ItemStack(Material.NAME_TAG);
-		ItemMeta editNameMeta = editName.getItemMeta();
-		editNameMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.edit_name"));
-		editName.setItemMeta(editNameMeta);
-		inv.setItem(31, editName);
-		
-		ItemStack editOrder = new ItemStack(Material.PAPER);
-		ItemMeta editOrderMeta = editOrder.getItemMeta();
-		editOrderMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.edit_display_order"));
-		editOrderMeta.setLore(ChatUtils.getMessages(getCodes("%order%", storage.getOrderBy()), "inventory.viewstorage.display_order_meta"));
-		editOrder.setItemMeta(editOrderMeta);
-		inv.setItem(30, editOrder);
-		
-		ItemStack editInsertAll = new ItemStack(Material.COBBLESTONE);
-		ItemMeta editInsertAllMeta = editInsertAll.getItemMeta();
-		editInsertAllMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.viewstorage.toggle_insert_all"));
-		editInsertAllMeta.setLore(ChatUtils.getMessages(getCodes("%insert_all%", storage.canInsertAll()), "inventory.viewstorage.insert_all_meta"));
-		editInsertAll.setItemMeta(editInsertAllMeta);
-		inv.setItem(32, editInsertAll);
 
 		if(admin != null) {
 			ItemStack setAmount = new ItemStack(Material.DIAMOND);

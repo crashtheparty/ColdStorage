@@ -4,9 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.OfflinePlayer;
 import org.ctp.coldstorage.ColdStorage;
+import org.ctp.coldstorage.storage.Cache;
+import org.ctp.coldstorage.storage.StorageList;
+import org.ctp.coldstorage.utils.DatabaseUtils;
+import org.ctp.coldstorage.utils.MaterialUtils;
+import org.ctp.coldstorage.utils.yamlconfig.YamlConfig;
 
 public abstract class Database {
 	public ColdStorage plugin;
@@ -48,6 +56,27 @@ public abstract class Database {
 			migrateTables();
 		}
 		
+		migrateData();
+	}
+	
+	public void migrateData() {
+		YamlConfig config = ColdStorage.getPlugin().getConfiguration().getMainConfig();
+		if(config.getBoolean("migrate_material_names")) {
+			List<OfflinePlayer> players = DatabaseUtils.getOfflinePlayers();
+			for(OfflinePlayer player : players) {
+				StorageList storageList = StorageList.getList(player);
+				List<Cache> caches = new ArrayList<Cache>();
+				caches.addAll(storageList.getDrafts());
+				caches.addAll(storageList.getStorages());
+				for(Cache cache : caches) {
+					cache.setMaterial(MaterialUtils.migrateMaterial(cache.getMaterialName()));
+					DatabaseUtils.updateCache(player, cache);
+				}
+			}
+			
+			config.set("migrate_material_names", false);
+			config.saveConfig();
+		}
 	}
 	
 	public boolean hasRecord(String key, String table){

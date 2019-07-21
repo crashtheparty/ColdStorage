@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -19,11 +20,13 @@ import org.ctp.coldstorage.utils.StorageUtils;
 
 public class BlockListener implements Listener{
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
+		if(event.isCancelled()) return;
 		Bukkit.getScheduler().runTaskLater(ColdStorage.getPlugin(), new Runnable() {
 			@Override
 			public void run() {
+				if(event.isCancelled()) return;
 				Block block = event.getBlock();
 				InventoryHolder invHolder = StorageUtils.getChestInventory(block);
 				if(invHolder != null && invHolder instanceof DoubleChest) {
@@ -50,8 +53,9 @@ public class BlockListener implements Listener{
 		}, 2l);
 	}
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onBlockBreak(BlockBreakEvent event) {
+		if(event.isCancelled()) return;
 		if(event.getBlock().getType() == Material.CHEST && DatabaseUtils.hasChest(event.getBlock())) {
 			if(StorageUtils.gettingNewChest(event.getPlayer())) {
 				if(DatabaseUtils.getChest(event.getBlock().getLocation()).getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())
@@ -72,7 +76,7 @@ public class BlockListener implements Listener{
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onEntityExplode(EntityExplodeEvent event) {
 		for(int i = event.blockList().size() - 1; i >= 0; i--) {
 			Block block = event.blockList().get(i);

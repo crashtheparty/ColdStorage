@@ -85,12 +85,12 @@ public class CacheTable extends Table{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				if(!isDraft && !rs.getBoolean("is_draft")){
-					Storage storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), 
+					Storage storage = new Storage(player, rs.getString("storage_unique"), rs.getString("material"), 
 							rs.getString("metadata"), rs.getString("storage_type"), rs.getString("name"), 
 							rs.getInt("stored_amount"), rs.getInt("order_by"), rs.getBoolean("can_insert_all"));
 					storages.add(storage);
 				} else if(isDraft && rs.getBoolean("is_draft")){
-					Draft draft = new Draft(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), 
+					Draft draft = new Draft(player, rs.getString("storage_unique"), rs.getString("material"), 
 							rs.getString("metadata"), rs.getString("storage_type"), rs.getString("name"));
 					storages.add(draft);
 				}
@@ -126,11 +126,11 @@ public class CacheTable extends Table{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				if(!isDraft && !rs.getBoolean("is_draft")){
-					storage = new Storage(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), 
+					storage = new Storage(player, rs.getString("storage_unique"), rs.getString("material"), 
 							rs.getString("metadata"), rs.getString("storage_type"), rs.getString("name"), 
 							rs.getInt("stored_amount"), rs.getInt("order_by"), rs.getBoolean("can_insert_all"));
 				} else if(isDraft && rs.getBoolean("is_draft")){
-					storage = new Draft(player, rs.getString("storage_unique"), Material.valueOf(rs.getString("material")), 
+					storage = new Draft(player, rs.getString("storage_unique"), rs.getString("material"), 
 							rs.getString("metadata"), rs.getString("storage_type"), rs.getString("name"));
 				}
 			}
@@ -196,7 +196,7 @@ public class CacheTable extends Table{
 					Storage storage = (Storage) cache;
 					
 					ps = conn.prepareStatement("UPDATE " + this.getName() + " SET stored_amount = ?, order_by = ?, storage_type = ?, is_draft = ?, "
-							+ "name = ?, can_insert_all = ?, modified_by = ?, updated_at = ? WHERE player = ? AND storage_unique = ?");
+							+ "name = ?, can_insert_all = ?, material = ?, modified_by = ?, updated_at = ? WHERE player = ? AND storage_unique = ?");
 					
 					ps.setInt(1, storage.getStoredAmount()); 
 					ps.setInt(2, storage.getOrderBy());
@@ -204,11 +204,12 @@ public class CacheTable extends Table{
 					ps.setBoolean(4, false);  
 					ps.setString(5, storage.getName());
 					ps.setBoolean(6, storage.canInsertAll());
-					ps.setString(7, player.getUniqueId().toString()); 
-					ps.setString(8, dateString); 
+					ps.setString(7, storage.getMaterial().name());
+					ps.setString(8, player.getUniqueId().toString()); 
+					ps.setString(9, dateString); 
 		
-					ps.setString(9, storage.getPlayer().getUniqueId().toString());
-					ps.setString(10, storage.getUnique());
+					ps.setString(10, storage.getPlayer().getUniqueId().toString());
+					ps.setString(11, storage.getUnique());
 					
 					ps.executeUpdate();
 				} else if (cache instanceof Draft) {
