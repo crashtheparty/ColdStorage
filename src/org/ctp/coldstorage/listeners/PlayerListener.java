@@ -18,14 +18,13 @@ public class PlayerListener implements Listener{
 
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if(event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
-			ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.interact_event_cancelled"));
-			return;
-		}
-		
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if(StorageUtils.gettingNewChest(event.getPlayer())) {
 				if(event.getClickedBlock().getState() instanceof org.bukkit.block.Chest) {
+					if(event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+						ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.interact_event_cancelled"));
+						return;
+					}
 					event.setCancelled(true);
 					if(StorageUtils.setNewChest(event.getPlayer(), event.getClickedBlock())) {
 						ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "listeners.new_chest"));
