@@ -99,6 +99,8 @@ public class Table {
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -130,6 +132,8 @@ public class Table {
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -160,7 +164,6 @@ public class Table {
 				ps.setString(1, player);
 			}
 			ps.executeUpdate();
-			return;
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
@@ -199,6 +202,8 @@ public class Table {
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -229,7 +234,6 @@ public class Table {
 				ps.setString(1, player);
 			}
 			ps.executeUpdate();
-			return;
 		} catch (SQLException ex) {
 			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
@@ -248,22 +252,34 @@ public class Table {
 	}
 	
 	public boolean tableExists(Connection connection) {
+		boolean tableExists = false;
+		ResultSet rs = null;
 		try {
 			DatabaseMetaData md = connection.getMetaData();
-			ResultSet rs = md.getTables(null, null, name, null);
+			rs = md.getTables(null, null, name, null);
 			if (rs.next()) {
-				return true;
+				tableExists = true;
 			}
 		} catch (SQLException ex) {
 
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (SQLException ex) {
+				getDb().getPlugin().getLogger().log(Level.SEVERE,
+						Errors.sqlConnectionClose(), ex);
+			}
 		}
-		return false;
+		return tableExists;
 	}
 	
 	public void createTable(Connection connection){
+		PreparedStatement s = null;
+		ResultSet rs = null;
 		try{
-			PreparedStatement s = connection.prepareStatement("PRAGMA table_info(" + name + ")");
-			ResultSet rs = s.executeQuery();
+			s = connection.prepareStatement("PRAGMA table_info(" + name + ")");
+			rs = s.executeQuery();
 			ArrayList<String> columnsInTable = new ArrayList<String>();
 			boolean has_table = tableExists(connection);
 			while(rs.next()){
@@ -287,7 +303,7 @@ public class Table {
 						st.close();
 					}
 				}
-			}else {
+			} else {
 				if(hasPrimaryKeys()) {
 					String statement = 
 							"CREATE TABLE IF NOT EXISTS " + name + " (";
@@ -318,7 +334,7 @@ public class Table {
 					ChatUtils.sendToConsole("Failed to add table " + name + ": primary keys undefined.");
 				}
 			}
-		}catch(SQLException ex){
+		} catch (SQLException ex) {
 			if(ex.getMessage().equalsIgnoreCase("query does not return results")){
 				if(hasPrimaryKeys()) {
 					String statement = 
@@ -351,6 +367,16 @@ public class Table {
 				}
 			}else{
 				ex.printStackTrace();
+			}
+		} finally {
+			try {
+				if (s != null)
+					s.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException ex) {
+				getDb().getPlugin().getLogger().log(Level.SEVERE,
+						Errors.sqlConnectionClose(), ex);
 			}
 		}
 	}

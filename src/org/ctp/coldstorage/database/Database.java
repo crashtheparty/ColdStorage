@@ -38,16 +38,30 @@ public abstract class Database {
 
 	public void initialize() {
 		connection = getSQLConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean retrieveConnection = true;
 		try {
-			PreparedStatement ps = connection.prepareStatement("SELECT * FROM "
+			ps = connection.prepareStatement("SELECT * FROM "
 					+ table);
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 			close(ps, rs);
 
 		} catch (SQLException ex) {
 			plugin.getLogger().log(Level.SEVERE,
 					"Unable to retreive connection", ex);
-			return;
+			retrieveConnection = false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException ex) {
+				plugin.getLogger().log(Level.SEVERE,
+						Errors.sqlConnectionClose(), ex);
+			}
+			if(!retrieveConnection) return;
 		}
 		
 		if(newInitialized) {
@@ -77,110 +91,6 @@ public abstract class Database {
 			config.set("migrate_material_names", false);
 			config.saveConfig();
 		}
-	}
-	
-	public boolean hasRecord(String key, String table){
-		Connection conn = null;
-		ResultSet rs = null;
-		PreparedStatement ps = null;
-		boolean found = false;
-		try {
-			String query = "SELECT (count(*) > 0) as found FROM " + table + " WHERE player LIKE ?";
-			conn = getSQLConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, key);
-			rs = ps.executeQuery();
-			
-			if (rs.next()) {
-				found = rs.getBoolean(1); // "found" column
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException ex) {
-				plugin.getLogger().log(Level.SEVERE,
-						Errors.sqlConnectionClose(), ex);
-			}
-		}
-		return found;
-	}
-	
-	public Integer getInteger(String table, String key, String field){
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		Integer integer = 0;
-		try {
-			conn = getSQLConnection();
-			ps = conn.prepareStatement("SELECT * FROM " + table
-					+ " WHERE player = '" + key + "';");
-
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				if (rs.getString("player").equals(
-						key)) { 
-					integer = rs.getInt(field);
-					break;
-				}
-			}
-		} catch (SQLException ex) {
-			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
-					ex);
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException ex) {
-				plugin.getLogger().log(Level.SEVERE,
-						Errors.sqlConnectionClose(), ex);
-			}
-		}
-		return integer;
-	}
-	
-	public void setInteger(String table, String key, String field, Integer integer){
-		Connection conn = null;
-		PreparedStatement ps = null;
-		boolean hasRecord = hasRecord(key, table);
-		try {
-			conn = getSQLConnection();
-			if(hasRecord){
-				ps = conn.prepareStatement("UPDATE " + table + " SET " + field + " = ? WHERE player = ?");
-	
-				ps.setInt(1, integer); 
-	
-				ps.setString(2, key);
-			}else{
-				ps = conn.prepareStatement("INSERT INTO " + table + " (player, " + field + ") VALUES (?, ?)");
-				
-				ps.setInt(2, integer); 
-	
-				ps.setString(1, key);
-			}
-			ps.executeUpdate();
-			return;
-		} catch (SQLException ex) {
-			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
-					ex);
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException ex) {
-				plugin.getLogger().log(Level.SEVERE,
-						Errors.sqlConnectionClose(), ex);
-			}
-		}
-		return;
 	}
 	
 	public void close(PreparedStatement ps, ResultSet rs) {

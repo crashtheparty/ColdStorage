@@ -110,6 +110,8 @@ public class SQLite extends Database {
 	public void migrateTables() {
 		Connection conn = null;
 		PreparedStatement ps = null;
+		Connection conn2 = null;
+		PreparedStatement ps2 = null;
 		ResultSet rs = null;
 		StorageType type = ColdStorage.getPlugin().getConfiguration().getLegacyData();
 		List<Storage> storages = new ArrayList<Storage>();
@@ -131,6 +133,8 @@ public class SQLite extends Database {
 				try {
 					if (ps != null)
 						ps.close();
+					if (rs != null)
+						rs.close();
 					if (conn != null)
 						conn.close();
 				} catch (SQLException ex) {
@@ -147,18 +151,18 @@ public class SQLite extends Database {
 			}
 
 			try {
-				conn = getSQLConnection();
-				ps = conn.prepareStatement("DROP TABLE IF EXISTS cold_storage;");
+				conn2 = getSQLConnection();
+				ps2 = conn2.prepareStatement("DROP TABLE IF EXISTS cold_storage;");
 
-				ps.execute();
+				ps2.execute();
 			} catch (SQLException ex) {
 				
 			} finally {
 				try {
-					if (ps != null)
-						ps.close();
-					if (conn != null)
-						conn.close();
+					if (ps2 != null)
+						ps2.close();
+					if (conn2 != null)
+						conn2.close();
 				} catch (SQLException ex) {
 					getPlugin().getLogger().log(Level.SEVERE,
 							Errors.sqlConnectionClose(), ex);

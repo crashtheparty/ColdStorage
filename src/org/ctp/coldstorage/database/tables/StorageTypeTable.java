@@ -56,6 +56,8 @@ public class StorageTypeTable extends Table{
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -88,6 +90,8 @@ public class StorageTypeTable extends Table{
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -119,6 +123,8 @@ public class StorageTypeTable extends Table{
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -266,6 +272,8 @@ public class StorageTypeTable extends Table{
 			try {
 				if (ps != null)
 					ps.close();
+				if (rs != null)
+					rs.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
@@ -314,6 +322,8 @@ public class StorageTypeTable extends Table{
 				try {
 					if (ps != null)
 						ps.close();
+					if (rs != null)
+						rs.close();
 					if (conn != null)
 						conn.close();
 				} catch (SQLException ex) {

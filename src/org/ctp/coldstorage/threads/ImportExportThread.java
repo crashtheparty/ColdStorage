@@ -6,8 +6,17 @@ public class ImportExportThread implements Runnable{
 
 	@Override
 	public void run() {
+		try {
 		StorageUtils.setImportChests();
-		StorageUtils.setExportChests();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		try {
+			StorageUtils.setExportChests();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}	
 	
 }

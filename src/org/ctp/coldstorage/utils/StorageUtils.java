@@ -35,11 +35,12 @@ public class StorageUtils {
 			Chest chest = DatabaseUtils.getChest(record.getChestUUID());
 			OfflinePlayer player = chest.getPlayer();
 			Storage storage = (Storage) DatabaseUtils.getCache(player, record.getStorageUUID(), false);
+			if(storage.getStorageType() == null) continue;
 			ItemStack item = ItemSerialization.dataToItem(storage.getMaterial(), 1, storage.getMeta());
 			if(chest.getLoc().getWorld().isChunkLoaded(chest.getLoc().getBlockX() / 16, chest.getLoc().getBlockZ() / 16)) {
 				if(chest.getLoc().getBlock().getState() instanceof org.bukkit.block.Chest) {
 					Inventory inv = ((org.bukkit.block.Chest) chest.getLoc().getBlock().getState()).getInventory();
-					if(inv.containsAtLeast(item, 1)) {
+					if(inv.containsAtLeast(item, 1) && storage.getStoredAmount() < storage.getStorageType().getMaxAmountBase()) {
 						if(inv.removeItem(item).isEmpty()) {
 							storage.setStoredAmount(storage.getStoredAmount() + 1);
 							DatabaseUtils.updateCache(player, storage);
