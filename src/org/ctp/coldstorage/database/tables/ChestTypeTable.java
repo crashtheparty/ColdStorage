@@ -290,7 +290,7 @@ public class ChestTypeTable extends Table{
 		return;
 	}
 	
-	public void deleteChestType(Chest chest, Storage storage) {
+	public void deleteChestType(Chest chest, String storageUnique) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
@@ -299,7 +299,7 @@ public class ChestTypeTable extends Table{
 					" WHERE chest_unique = ? AND storage_unique = ?");
 			
 			ps.setString(1, chest.getUnique());
-			ps.setString(2, storage.getUnique());
+			ps.setString(2, storageUnique);
 			
 			ps.execute();
 		} catch (SQLException ex) {
@@ -317,6 +317,10 @@ public class ChestTypeTable extends Table{
 			}
 		}
 		return;
+	}
+	
+	public void deleteChestType(Chest chest, Storage storage) {
+		deleteChestType(chest, storage.getUnique());
 	}
 
 }

@@ -419,6 +419,15 @@ public class DatabaseUtils {
 		}
 		chestTable.deleteChestType(chest, storage);
 	}
+	
+	public static void deleteChestType(String storageUnique, Chest chest) {
+		Table table = ColdStorage.getPlugin().getDb().getTable(ChestTypeTable.class);
+		ChestTypeTable chestTable = null;
+		if(table instanceof ChestTypeTable) {
+			chestTable = (ChestTypeTable) table;
+		}
+		chestTable.deleteChestType(chest, storageUnique);
+	}
 
 	public static List<ChestTypeRecord> getChestTypes(ChestType type) {
 		Table table = ColdStorage.getPlugin().getDb().getTable(ChestTypeTable.class);
