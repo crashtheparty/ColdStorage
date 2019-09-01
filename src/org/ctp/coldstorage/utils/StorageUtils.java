@@ -74,7 +74,7 @@ public class StorageUtils {
 			OfflinePlayer player = chest.getPlayer();
 			Storage storage = (Storage) DatabaseUtils.getCache(player, record.getStorageUUID(), false);
 			if(storage == null) {
-				DatabaseUtils.deleteChestType(storage, chest);
+				DatabaseUtils.deleteChestType(record.getStorageUUID(), chest);
 				continue;
 			}
 			if(storage.getStorageType() == null) continue;
