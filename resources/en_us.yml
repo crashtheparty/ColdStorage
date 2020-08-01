@@ -1,0 +1,303 @@
+commands: 
+    admin: 'Opening admin inventory...'
+    open: 'Opening Cold Storage...'
+    add_chest: 'Right-click on a chest to allow importing/exporting items.'
+    no_permission: 'You do not have permission to use this command!'
+    aliases: 
+        csopen: 
+        - 'open'
+        - 'openstorage'
+        - 'cso'
+
+        csadmin: 
+        - 'csa'
+        - 'adminstorage'
+
+        cschest: 
+        - 'csc'
+        - 'chest'
+        - 'cheststorage'
+
+        csreload: 
+        - 'csr'
+        - 'reloadstorage'
+
+        cshelp: 
+        - 'csh'
+        - 'help'
+        - 'helpstorage'
+
+    descriptions: 
+        csopen: 'Opens cold storage for the user.'
+        csadmin: 'Opens an editing inventory for administration purposes.'
+        cschest: 'Allows the player to set an import/export chest.'
+        csreload: 'Reloads the plugin.'
+        cshelp: 'Details the commands.'
+    usage: 
+        csopen: 
+            main: 'Usage: %usage%\nAliases: %aliases%'
+            string: 'csopen'
+        csadmin: 
+            main: 'Usage: %usage%\nAliases: %aliases%'
+            string: 'csadmin'
+        cschest: 
+            main: 'Usage: %usage%\nAliases: %aliases%'
+            string: 'cschest'
+        csreload: 
+            main: 'Usage: %usage%\nAliases: %aliases%'
+            string: 'csreload'
+        cshelp: 
+            main: 'Usage: %usage%\nAliases: %aliases%'
+            string: 'cshelp'
+    help:
+        commands_page: '&bCommands Page %page%'
+        commands_info_shrink: '&f: %description%'
+database: 
+    issue: 'Issue with the plugin. Please contact an administrator to get this resolved.'
+exceptions: 
+    number_format: '&cString %num% is not a number.'
+    number_too_low: '&cNumber %num% is too low for this value: lowest is %lowest%. Setting value to %lowest%.'
+    option_nonexistent: '&cOption %option% does not exist in %area%.'
+    missing_storage_type: '&cThere was an issue opening storage type - does not exist??'
+    invalid_storage_type: '&cInvalid storage type!'
+    invalid_permission_string: 
+        1: '&cPermission string "%name%" is not a valid permission string!'
+        2: '&cMay only contain letters, numbers, dashes, and underscores.'
+    permission_exists: '&cPermission with name %permission% already exists!'
+    missing_permission: '&cPermission does not exist!'
+    missing_draft: '&cThere was an issue opening draft - does not exist??'
+    missing_storage: '&cThere was an issue opening storage - does not exist??'
+    missing_money: '&cYou do not have enough money to buy this: Need %money%.'
+    incompatible_material: '&c%clicked_material% and %material% does not match!'
+    incompatible_item: '&cThe item metadata does not match!'
+    bad_storage_type: '&cStorage Type %storage_type% doesn''t exist - cannot insert new items.'
+    item_limit_reached: '&cItem limit reached!'
+    permissions_not_updated: '&cIssues removing permissions from storage types - try again or send an issue to the plugin creator.'
+    invalid_block_break: '&cCannot break an already set chest!'
+    chest_exists: '&cChest already exists in the database!'
+    no_export: '&cThis storage can''t use export chests!'
+    no_import: '&cThis storage can''t use import chests!'
+    too_many_export: '&cToo many export chests already!'
+    too_many_import: '&cToo many import chests already!'
+    chest_in_use: '&cYou can''t break a chest that''s in use!'
+    cannot_modify_yourself: '&cCannot modify your own storages!'
+    missing_player: '&cPlayer does not exist!'
+    not_your_chest: '&cYou cannot delete someone else''s chests!'
+    chest_delete: '&cIssue with deleting chest, please talk to an admin.'
+    has_chest_types: '&cCannot delete a chest that is currently in use!'
+    interact_event_cancelled: '&cCannot claim this chest: event cancelled!'
+info: 
+    true: 'true'
+    false: 'false'
+    free: 'Free'
+    unknown: 'Unknown'
+    bad_material: 'Bad Material - Disabled'
+inventory: 
+    click: 
+        item_set: 'Set to %item%.'
+        canceled: 'Canceled.'
+        storage_item: 'Select an item from your inventory to set storage item, or click the emerald to cancel.'
+        item_cost: 'Select an item from your inventory to set item cost, or click the emerald to cancel.'
+    pagination: 
+        go_back: '&dGo Back'
+        next_page: '&eNext Page'
+        previous_page: '&ePrevious Page'
+    create_remove: 
+        delete_type: '&4Delete Type'
+        delete: '&4Delete'
+        delete_draft: '&4Delete Draft'
+        confirm_delete: '&aYes, Delete This'
+        deny_delete: '&cNo, Don''t Delete'
+        buy_cold_storage: '&2Create New Draft'
+        create_draft: '&2Buy Cold Storage'
+        create_storage_type: '&2Create New Storage Type'
+        create_permission: '&2Create New Permission'
+        remove_storage: '&4Delete Storage'
+        create_global_permission: '&2Create New Global Permission'
+    adminlist: 
+        title: 'Admin Functions'
+        modify_permissions: '&5Modify Permissions'
+        modify_global_permissions: '&5Modify Global Permissions'
+        modify_storage_types: '&5Modify Storage Types'
+        modify_players: '&5Modify Players'
+    editstoragetype: 
+        title: 'Edit Storage Type'
+        name: '&9%name%'
+        import: '&9Import Items'
+        max_import: 
+        - '&6Max Import: &3%max_import%'
+        - '&fClick to edit.'
+
+        export: '&9Export Items'
+        max_export: 
+        - '&6Max Export: &3%max_export%'
+        - '&fClick to edit.'
+
+        vault_cost: '&9Vault Cost'
+        get_vault_cost: 
+        - '&6Cost: &3%vault_cost%'
+        - '&fClick to edit.'
+
+        item_cost: '&9Item Cost'
+        get_item_cost: 
+        - '&6Cost: &3%item_cost%'
+        - '&fClick to edit.'
+
+        max_amount: '&9Max Amount'
+        get_max_amount: 
+        - '&6Amount: &3%max_amount%'
+        - '&fClick to edit.'
+
+        permissions: '&9Permissions'
+    editstoragelist: 
+        title: 'Storage Type List'
+        title_paginated: 'Storage Type List Page %page%'
+        storage_type: '&6Storage Type: &3%type%'
+        storage_lore: 
+        - '&6Max Storage Size: &3%size%'
+        - '&6Price: &3%price%'
+
+    edittypepermissions: 
+        title: 'Edit Permission'
+        title_paginated: 'Edit Permission Page %page%'
+        permission: '&6Permission: &3%permission%'
+        permission_lore: 
+        - '&6Check Order: &3%check_order%'
+        - '&6Number of Storages: &3%num_storages%'
+        - '&6Selected: &3%selected%'
+
+    listpermissions: 
+        title: 'Edit Permission'
+        title_paginated: 'Edit Permission Page %page%'
+        permission: '&6Permission: &3%permission%'
+        permission_lore: 
+        - '&6Check Order: &3%check_order%'
+        - '&6Number of Storages: &3%num_storages%'
+
+    viewpermission: 
+        title: 'Edit Permission: %permission%'
+        permission_string: '&6Permission String: &3%permission%'
+        check_order: '&6Check Order: &3%check_order%'
+        num_storages: '&6Number of Storages: &3%num_storages%'
+    listglobalpermissions: 
+        title: 'Edit Global Permission'
+        title_paginated: 'Edit Permission Page %page%'
+        permission: '&6Permission: &3%permission%'
+        permission_lore: 
+        - '&6Check Order: &3%check_order%'
+        - '&6Number of Storages: &3%num_storages%'
+
+    viewglobalpermission: 
+        title: 'Edit Global Permission: %permission%'
+        permission_string: '&6Permission String: &3%permission%'
+        check_order: '&6Check Order: &3%check_order%'
+        num_storages: '&6Number of Storages: &3%num_storages%'
+    draftlist: 
+        title: '%player%''s Drafts'
+        title_paginated: '%player%''s Drafts Page %page%'
+        name: '&6Name: &3%name%'
+        max_amount: '&6Max Storage Size: &3%max_amount%'
+        metadata: '&6Metadata: '
+        viewstorages: '&dView Storages'
+    viewdraft: 
+        title: 'Cold Storage: %name%'
+        name: '&6Name: &3%name%'
+        name_lore: '&fClick to edit the name. Must have a name before finalizing.'
+        item_type: '&6Item Type: &3%item_type%'
+        meta_first: '&6Meta: &3%meta%'
+        meta: '&3%meta%'
+        storage_type: '&6Storage Type: &3%storage_type%'
+        exists: '&6Exists: &3%exists%'
+        max_storage: '&6Max Storage: &3%max_storage%'
+        price: '&6Price: &3%price%'
+        max_number: '&6Max Number: &3%max_number%'
+        max_import: '&6Max Import: &3%max_import%'
+        max_export: '&6Max Export: &3%max_export%'
+        buy_invalid: '&4Buy'
+        buy: '&2Buy'
+        buy_price: '&2Price: &a%price%'
+        issues: '&c%issue%'
+    storagelist: 
+        title: '%player%''s List'
+        title_paginated: '%player%''s List Page %page%'
+        name: '&9%name%'
+        amount: '&6Stored Amount: &3%amount%'
+        insert: '&6Insert All: &3%insert%'
+        insert_all: '&9Insert Items to Cold Storages'
+        inserted: '&fInserted %amount% of %material% into %storage%.'
+        meta_first: '&6Metadata: &3%meta%'
+        meta: '&3%meta%'
+        null_material: '&4Non-Existent Material: &3%name%'
+    viewstorage: 
+        title: 'Cold Storage: %name%'
+        take_stack: '&9Take a Stack'
+        type_meta: 
+        - '&6Amount: &3%stored_amount%'
+        - '&6Max Storage Size: &3%max_size%'
+
+        meta_first: '&6Metadata: &3%meta%'
+        meta: '&3%meta%'
+        fill_inventory: '&9Fill Inventory'
+        empty_inventory: '&9Empty Inventory'
+        empty_inventory_info: '&fClick items in your inventory to insert manually.'
+        edit_name: '&9Edit Name'
+        import_chest: '&9Import Chests'
+        edit_import_chest: 
+        - '&6Max Import Chests: &3%max_import%'
+        - '&fClick to edit.'
+
+        export_chest: '&9Export Chests'
+        edit_export_chest: 
+        - '&6Max Export Chests: &3%max_export%'
+        - '&fClick to edit.'
+
+        edit_display_order: '&9Edit Display Order'
+        display_order_meta: '&6Current: &3%order%'
+        toggle_insert_all: '&9Toggle Insert All'
+        insert_all_meta: '&6Current: &3%insert_all%'
+        set_amount: '&9Edit the Stored Amount'
+    storagetypelist: 
+        title: 'Select Storage Type'
+        title_paginated: 'Select Storage Type Page %page%'
+        storage_type: '&6Storage Type: &3%storage_type%'
+        storage_meta: 
+        - '&6Max Storage Size: &3%max_amount%'
+        - '&6Price: &3%price%'
+
+    editchests: 
+        title: '%name% Edit %type% Chests'
+        title_paginated: '%name% Edit %type% Chests Page %page%'
+        different_type: '&cCannot Toggle - Set to other chest type.'
+        chest_type: '&9Chest Type'
+        chest_type_locations: 
+        - '&6Location: &3%location_one%'
+        - '&6Second Location: &3%location_two%'
+
+        selected: '&6Selected: &3%selected%'
+        owning_player: '&9%owning_player%''s Storages'
+        meta: 
+        - '&fClick to edit.'
+
+    playerlist: 
+        title: 'Modify Player Storages'
+        title_paginated: 'Modify Player Storages Page %page%'
+        owning_player: '&9%owning_player%''s Storages'
+        meta: 
+        - '&fClick to edit.'
+
+listeners: 
+    open_inventory: 'Opened chest owned by %owned_player%.'
+    new_chest: 'Created new chest! Add to a storage using the edit menu.'
+    break_chest: 'Broke the chest! If this was a double chest, the second chest was removed as well.'
+    use_chat: 'Type in chat to set the value. Your inventory will not work until you do this.'
+reasons: 
+    player_null: 'Player cannot be null.'
+    unique_null: 'Unique cannot be null.'
+    material_null: 'You must select a material.'
+    storage_type_missing: 'Storage type no longer exists: %storage_type%'
+    storage_type_null: 'You must select a storage type.'
+    name_null: 'You must give the storage a name.'
+    no_permission: 'You do not have permission for this storage type.'
+    too_many_type: 'You already have the maximum amount of storages for this type.'
+    too_many_total: 'You already have the maximum amount of storages.'
+starter: '&8[&6ColdStorage&8] &f'

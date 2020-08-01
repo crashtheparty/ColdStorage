@@ -1,20 +1,26 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 2.0.9
+version: 2.1.0
 name: ColdStorage
 api-version: 1.13
+depend: [CrashAPI]
 commands:
-    open:
+    csopen:
         description: Opens the cold storage
         permission: coldstorage.open
-    admin:
+    csadmin:
         description: Edits cold storage information
         permission: coldstorage.admin
     csreload:
         description: Edits cold storage information
         permission: coldstorage.reload
-    chest:
+    cschest:
         description: Add import/export chest
         permission: coldstorage.chest
+    coldstorage:
+        description: Main command for ColdStorage
+    cshelp:
+        description: Commands player can use
+        permission: coldstorage.help
 permissions:
     coldstorage.open:
         description: Allows player to open their cold storages
@@ -30,4 +36,7 @@ permissions:
         default: op
     coldstorage.chest:
         description: Allows player to add import/export chests
+        default: true
+    coldstorage.help:
+        description: Allows player to view information on commands they can use
         default: true

@@ -7,26 +7,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.inventory.Anvilable;
-import org.ctp.coldstorage.inventory.ColdStorageInventory;
-import org.ctp.coldstorage.utils.inventory.InventoryUtils;
+import org.ctp.crashapi.inventory.InventoryData;
 
 public class ChatMessage implements Listener{
 
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		ColdStorageInventory inv = InventoryUtils.getInventory(player);
+		InventoryData inv = ColdStorage.getPlugin().getInventory(player);
 		if (inv != null) {
 			event.setCancelled(true);
 			Bukkit.getScheduler().runTask(ColdStorage.getPlugin(), new Runnable() {
+				@Override
 				public void run() {
 					if (inv instanceof Anvilable) {
 						Anvilable anvil = (Anvilable) inv;
-						if (anvil.isChoice()) {
-							anvil.setChoice(event.getMessage());
-						} else if (anvil.isEditing()) {
-							anvil.setItemName(event.getMessage());
-						}
+						if (anvil.isChoice()) anvil.setChoice(event.getMessage());
+						else if (anvil.willEdit()) anvil.setItemName(event.getMessage());
 					}
 				}
 			});

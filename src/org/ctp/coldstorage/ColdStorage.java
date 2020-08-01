@@ -1,57 +1,71 @@
 package org.ctp.coldstorage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.ctp.coldstorage.commands.AddChest;
-import org.ctp.coldstorage.commands.Admin;
-import org.ctp.coldstorage.commands.Open;
-import org.ctp.coldstorage.commands.Reload;
-import org.ctp.coldstorage.database.SQLite;
-import org.ctp.coldstorage.listeners.BlockListener;
-import org.ctp.coldstorage.listeners.ChatMessage;
-import org.ctp.coldstorage.listeners.InventoryClick;
-import org.ctp.coldstorage.listeners.InventoryClose;
-import org.ctp.coldstorage.listeners.PlayerListener;
+import org.ctp.coldstorage.commands.ColdStorageCommand;
+import org.ctp.coldstorage.database.CSBackup;
+import org.ctp.coldstorage.database.CSDatabase;
+import org.ctp.coldstorage.listeners.*;
 import org.ctp.coldstorage.threads.ImportExportThread;
+import org.ctp.coldstorage.utils.Configurations;
 import org.ctp.coldstorage.utils.DatabaseUtils;
-import org.ctp.coldstorage.utils.config.Configuration;
-import org.ctp.coldstorage.version.BukkitVersion;
-import org.ctp.coldstorage.version.PluginVersion;
-import org.ctp.coldstorage.version.VersionCheck;
+import org.ctp.coldstorage.utils.commands.CSCommand;
+import org.ctp.crashapi.CrashAPI;
+import org.ctp.crashapi.CrashAPIPlugin;
+import org.ctp.crashapi.config.yaml.YamlConfig;
+import org.ctp.crashapi.inventory.InventoryData;
+import org.ctp.crashapi.item.ItemSerialization;
+import org.ctp.crashapi.utils.ChatUtils;
+import org.ctp.crashapi.version.*;
+import org.ctp.crashapi.version.Version.VersionType;
 
 import net.milkbowl.vault.economy.Economy;
 
-public class ColdStorage extends JavaPlugin{
+public class ColdStorage extends CrashAPIPlugin {
 	
 	private static ColdStorage PLUGIN;
-	private SQLite db;
-	private BukkitVersion bukkitVersion;
-	private PluginVersion pluginVersion;
-	private VersionCheck check;
-	private Configuration config;
-	private boolean initializing = true;
 	private static Economy ECON = null;
 	private static Boolean HAS_VAULT = null;
+	private CSDatabase db;
+	private CSBackup backup;
+	private PluginVersion pluginVersion;
+	private VersionCheck check;
+	private Configurations config;
+	private boolean initializing = true;
+	private List<InventoryData> inventories = new ArrayList<InventoryData>();
 	
+	@Override
 	public void onEnable() {
 		PLUGIN = this;
-		setBukkitVersion(new BukkitVersion());
-		setPluginVersion(new PluginVersion(this, getDescription().getVersion()));
-		if(!bukkitVersion.isVersionAllowed()) {
-			Bukkit.getLogger().log(Level.WARNING, "Bukkit Version " + bukkitVersion.getVersion() + " is not compatible with this plugin. Anvil GUI is not supported.");
+		BukkitVersion bukkitVersion = CrashAPI.getPlugin().getBukkitVersion();
+		setPluginVersion(new PluginVersion(this, new Version(getDescription().getVersion(), VersionType.UNKNOWN)));
+		if(!bukkitVersion.isVersionAllowed()) Bukkit.getLogger().log(Level.WARNING, "Bukkit Version " + bukkitVersion.getVersion() + " is not compatible with this plugin. Anvil GUI is not supported.");
+		
+		backup = new CSBackup(PLUGIN);
+		backup.load();
+		
+		config = Configurations.getConfigurations();
+		config.onEnable();
+
+		ColdStorageCommand c = new ColdStorageCommand();
+		getCommand("ColdStorage").setExecutor(c);
+		getCommand("ColdStorage").setTabCompleter(c);
+		for(CSCommand s: ColdStorageCommand.getCommands()) {
+			PluginCommand command = getCommand(s.getCommand());
+			if (command != null) {
+				command.setExecutor(c);
+				command.setTabCompleter(c);
+				command.setAliases(s.getAliases());
+			} else
+				getChat().sendWarning("Couldn't find command '" + s.getCommand() + ".'");
 		}
-		
-		getCommand("open").setExecutor(new Open());
-		getCommand("admin").setExecutor(new Admin());
-		getCommand("csreload").setExecutor(new Reload());
-		getCommand("chest").setExecutor(new AddChest());
-		
-		config = new Configuration(this);
-		config.createConfigFiles();
 		
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new InventoryClick(), this);
@@ -62,13 +76,13 @@ public class ColdStorage extends JavaPlugin{
 		
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(PLUGIN, new ImportExportThread(), 8l, 8l);
 		
-		db = new SQLite(PLUGIN);
+		db = new CSDatabase(PLUGIN);
 		db.load();
 		DatabaseUtils.loadValues();
 		
 		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/ColdStorage/master/VersionHistory", 
 				"https://www.spigotmc.org/resources/cold-storage.59581/", "https://github.com/crashtheparty/ColdStorage", 
-				config.getMainConfig().getBoolean("get_latest_version"));
+				config.getConfig().getBoolean("get_latest_version"), false);
 		pm.registerEvents(check, this);
 		checkVersion();
 		setInitializing(false);
@@ -78,18 +92,15 @@ public class ColdStorage extends JavaPlugin{
 		return PLUGIN;
 	}
 
-	public SQLite getDb() {
+	public CSDatabase getDb() {
 		return db;
 	}
 
-	public BukkitVersion getBukkitVersion() {
-		return bukkitVersion;
+	public CSBackup getBackup() {
+		return backup;
 	}
 
-	public void setBukkitVersion(BukkitVersion bukkitVersion) {
-		this.bukkitVersion = bukkitVersion;
-	}
-
+	@Override
 	public PluginVersion getPluginVersion() {
 		return pluginVersion;
 	}
@@ -104,14 +115,10 @@ public class ColdStorage extends JavaPlugin{
 	
 	public static boolean hasVault() {
 		if(HAS_VAULT == null) {
-			if(!Bukkit.getPluginManager().isPluginEnabled("Vault")){
-				return false;
-			}
+			if(!Bukkit.getPluginManager().isPluginEnabled("Vault")) return false;
 			RegisteredServiceProvider<Economy> rsp = Bukkit.getServer()
 					.getServicesManager().getRegistration(Economy.class);
-			if (rsp == null) {
-				return false;
-			}
+			if (rsp == null) return false;
 			ECON = rsp.getProvider();
 			HAS_VAULT = ECON != null;
 		}
@@ -122,15 +129,61 @@ public class ColdStorage extends JavaPlugin{
 		return ECON;
 	}
 	
-	public Configuration getConfiguration() {
+	public Configurations getConfiguration() {
 		return config;
 	}
 
+	@Override
 	public boolean isInitializing() {
 		return initializing;
 	}
 
 	public void setInitializing(boolean initializing) {
 		this.initializing = initializing;
+	}
+
+	@Override
+	public ChatUtils getChat() {
+		return ChatUtils.getUtils(PLUGIN);
+	}
+
+	@Override
+	public Configurations getConfigurations() {
+		return Configurations.getConfigurations();
+	}
+
+	@Override
+	public ItemSerialization getItemSerial() {
+		return ItemSerialization.getItemSerial(PLUGIN);
+	}
+
+	@Override
+	public YamlConfig getLanguageFile() {
+		return getConfigurations().getLanguageConfig().getConfig();
+	}
+
+	@Override
+	public String getStarter() {
+		return getLanguageFile().getString("starter");
+	}
+
+	public InventoryData getInventory(Player player) {
+		for(InventoryData inv: inventories)
+			if (inv.getPlayer().getUniqueId().equals(player.getUniqueId())) return inv;
+
+		return null;
+	}
+
+	public boolean hasInventory(InventoryData inv) {
+		return inventories.contains(inv);
+	}
+
+	public void addInventory(InventoryData inv) {
+		inventories.add(inv);
+		inv.setInventory();
+	}
+
+	public void removeInventory(InventoryData inv) {
+		inventories.remove(inv);
 	}
 }

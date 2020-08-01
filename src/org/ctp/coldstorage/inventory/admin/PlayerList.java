@@ -12,87 +12,38 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.ctp.coldstorage.inventory.ColdStorageInventory;
+import org.ctp.coldstorage.Chatable;
+import org.ctp.coldstorage.ColdStorage;
+import org.ctp.coldstorage.inventory.ColdStorageData;
 import org.ctp.coldstorage.inventory.storage.ListStorage;
 import org.ctp.coldstorage.storage.StorageType;
-import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.DatabaseUtils;
-import org.ctp.coldstorage.utils.inventory.InventoryUtils;
+import org.ctp.crashapi.inventory.Pageable;
+import org.ctp.crashapi.utils.ChatUtils;
 
-public class PlayerList implements ColdStorageInventory{
+public class PlayerList extends ColdStorageData implements Pageable {
 	
 	private final static int PAGING = 36;
-	private OfflinePlayer player, admin;
-	private Player show;
-	private Inventory inventory;
 	private int page = 1;
-	private boolean opening = false;
 	
-	public PlayerList(OfflinePlayer player) {
-		this.player = player;
-		if(this.player instanceof Player) {
-			setShow((Player) this.player); 
-		}
-	}
-	
-	public PlayerList(OfflinePlayer player, OfflinePlayer admin) {
-		this.player = player;
-		this.admin = admin;
-		if(this.admin != null && this.admin instanceof Player) {
-			setShow((Player) this.admin); 
-		} else {
-			setShow((Player) this.player); 
-		}
-	}
-	
-	@Override
-	public OfflinePlayer getPlayer() {
-		return player;
+	public PlayerList(Player player) {
+		super(player);
 	}
 
-	@Override
-	public void setPlayer(OfflinePlayer player) {
-		this.player = player;
-	}
-
-	@Override
-	public OfflinePlayer getAdmin() {
-		return admin;
-	}
-
-	@Override
-	public void setAdmin(OfflinePlayer player) {
-		this.admin = player;
-	}
-
-	@Override
-	public Player getShow() {
-		return show;
-	}
-
-	@Override
-	public void setShow(Player player) {
-		this.show = player;
-	}
-
-	@Override
-	public Inventory getInventory() {
-		return inventory;
+	public PlayerList(Player player, OfflinePlayer editing) {
+		super(player, editing);
 	}
 
 	@Override
 	public void setInventory() {
 		Inventory inv = null;
 		List<OfflinePlayer> players = DatabaseUtils.getOfflinePlayers();
-		if(players == null) {
-			players = new ArrayList<OfflinePlayer>();
-		}
-		if(PAGING >= players.size() && page == 1) {
-			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.playerlist.title"));
-		} else {
+		if(players == null) players = new ArrayList<OfflinePlayer>();
+		if(PAGING >= players.size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.playerlist.title"));
+		else {
 			HashMap<String, Object> titleCodes = getCodes();
 			titleCodes.put("%page%", page);
-			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(titleCodes, "inventory.playerlist.title_paginated"));
+			inv = Bukkit.createInventory(null, 54, getChat().getMessage(titleCodes, "inventory.playerlist.title_paginated"));
 		}
 		inv = open(inv);
 		
@@ -103,14 +54,12 @@ public class PlayerList implements ColdStorageInventory{
 			
 			ItemStack playerItem = new ItemStack(Material.PLAYER_HEAD);
 			ItemMeta playerItemMeta = playerItem.getItemMeta();
-			if(playerItemMeta instanceof SkullMeta) {
-				((SkullMeta) playerItemMeta).setOwningPlayer(offlinePlayer);
-			}
+			if(playerItemMeta instanceof SkullMeta) ((SkullMeta) playerItemMeta).setOwningPlayer(offlinePlayer);
 			HashMap<String, Object> itemCodes = getCodes();
 			itemCodes.put("%owning_player%", offlinePlayer.getName());
-			playerItemMeta.setDisplayName(ChatUtils.getMessage(itemCodes, "inventory.playerlist.owning_player"));
+			playerItemMeta.setDisplayName(getChat().getMessage(itemCodes, "inventory.playerlist.owning_player"));
 			List<String> lore = new ArrayList<String>();
-			lore.addAll(ChatUtils.getMessages(getCodes(), "inventory.playerlist.meta"));
+			lore.addAll(getChat().getMessages(getCodes(), "inventory.playerlist.meta"));
 			playerItemMeta.setLore(lore);
 			playerItem.setItemMeta(playerItemMeta);
 			inv.setItem(i, playerItem);
@@ -118,21 +67,21 @@ public class PlayerList implements ColdStorageInventory{
 		
 		ItemStack back = new ItemStack(Material.ARROW);
 		ItemMeta backMeta = back.getItemMeta();
-		backMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.go_back"));
+		backMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.go_back"));
 		back.setItemMeta(backMeta);
 		inv.setItem(49, back);
 
 		if(StorageType.getAll().size() > PAGING * page) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextPageMeta = nextPage.getItemMeta();
-			nextPageMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.next_page"));
+			nextPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.next_page"));
 			nextPage.setItemMeta(nextPageMeta);
 			inv.setItem(53, nextPage);
 		}
 		if(page != 1) {
 			ItemStack prevPage = new ItemStack(Material.ARROW);
 			ItemMeta prevPageMeta = prevPage.getItemMeta();
-			prevPageMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.previous_page"));
+			prevPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.previous_page"));
 			prevPage.setItemMeta(prevPageMeta);
 			inv.setItem(45, prevPage);
 		}
@@ -141,108 +90,40 @@ public class PlayerList implements ColdStorageInventory{
 	public void openStorageList(int slot) {
 		int num = slot + (PAGING * (page - 1));
 		List<OfflinePlayer> players = DatabaseUtils.getOfflinePlayers();
-		if(players == null) {
-			players = new ArrayList<OfflinePlayer>();
-		}
+		if(players == null) players = new ArrayList<OfflinePlayer>();
 		if(players.size() > num) {
 			OfflinePlayer player = players.get(num);
-			if(player.getUniqueId().equals(this.player.getUniqueId())) {
-				ChatUtils.sendMessage(show, ChatUtils.getMessage(getCodes(), "exceptions.cannot_modify_yourself"));
+			if(player.getUniqueId().equals(getPlayer().getUniqueId())) {
+				getChat().sendMessage(getPlayer(), getChat().getMessage(getCodes(), "exceptions.cannot_modify_yourself"));
 				setInventory();
 				return;
 			}
 			close(false);
-			InventoryUtils.addInventory(show, new ListStorage(player, this.player));
+			ColdStorage.getPlugin().addInventory(new ListStorage(getPlayer(), player));
 			return;
 		}
-		ChatUtils.sendMessage(show, ChatUtils.getMessage(getCodes(), "exceptions.missing_player"));
+		getChat().sendMessage(getPlayer(), getChat().getMessage(getCodes(), "exceptions.missing_player"));
 		setInventory();
 	}
 	
 	public void viewAdminList() {
 		close(false);
-		InventoryUtils.addInventory(show, new AdminList(player, admin));
-	}
-
-
-	@Override
-	public void close(boolean external) {
-		if(InventoryUtils.getInventory(show) != null) {
-			InventoryUtils.removeInventory(show);
-			if(!external) {
-				show.closeInventory();
-			}
-		}
-	}
-
-	@Override
-	public Inventory open(Inventory inv) {
-		opening = true;
-		if(inventory == null) {
-			inventory = inv;
-			show.openInventory(inv);
-		} else {
-			if(inv.getSize() == inventory.getSize()) {
-				inv = show.getOpenInventory().getTopInventory();
-				inventory = inv;
-			} else {
-				inventory = inv;
-				show.openInventory(inv);
-			}
-		}
-		for(int i = 0; i < inventory.getSize(); i++) {
-			inventory.setItem(i, new ItemStack(Material.AIR));
-		}
-		if(opening) {
-			opening = false;
-		}
-		return inv;
-	}
-
-	@Override
-	public boolean isOpening() {
-		return opening;
+		ColdStorage.getPlugin().addInventory(new AdminList(getPlayer(), getEditing()));
 	}
 	
-	public void changePage(int page) {
+	@Override
+	public void setPage(int page) {
 		this.page = page;
 	}
 
+	@Override
 	public int getPage() {
 		return page;
 	}
 
 	@Override
-	public HashMap<String, Object> getCodes() {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		return codes;
-	}
-	
-	public HashMap<String, Object> getCodes(String string, Object object) {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		codes.put(string, object);
-		return codes;
-	}
-	
-	public HashMap<String, Object> getCodes(HashMap<String, Object> objects) {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		codes.putAll(objects);
-		return codes;
+	public ChatUtils getChat() {
+		return Chatable.get();
 	}
 
 }

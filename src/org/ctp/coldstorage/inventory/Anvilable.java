@@ -2,9 +2,9 @@ package org.ctp.coldstorage.inventory;
 
 public interface Anvilable {
 
-	public boolean isEditing();
+	public boolean willEdit();
 	
-	public void setEditing(boolean editing);
+	public void setEdit(boolean edit);
 	
 	public void setItemName(String name);
 	

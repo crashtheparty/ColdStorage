@@ -13,10 +13,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.ctp.coldstorage.Chatable;
 import org.ctp.coldstorage.ColdStorage;
-import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.DatabaseUtils;
 import org.ctp.coldstorage.utils.StorageUtils;
+import org.ctp.crashapi.utils.ChatUtils;
 
 public class BlockListener implements Listener{
 	
@@ -45,9 +46,7 @@ public class BlockListener implements Listener{
 							}
 						}
 					}
-					if(loc != null && DatabaseUtils.hasChest(loc.getBlock())) {
-						DatabaseUtils.addDoubleChest(loc, locTwo);
-					}
+					if(loc != null && DatabaseUtils.hasChest(loc.getBlock())) DatabaseUtils.addDoubleChest(loc, locTwo);
 				}
 			}
 		}, 2l);
@@ -56,23 +55,19 @@ public class BlockListener implements Listener{
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if(event.isCancelled()) return;
-		if(event.getBlock().getType() == Material.CHEST && DatabaseUtils.hasChest(event.getBlock())) {
-			if(StorageUtils.gettingNewChest(event.getPlayer())) {
-				if(DatabaseUtils.getChest(event.getBlock().getLocation()).getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())
-						|| event.getPlayer().hasPermission("coldstorage.remove_chests")){
-					if(StorageUtils.deleteChest(event.getPlayer(), event.getBlock())) {
-						ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "listeners.break_chest"));
-					} else {
-						event.setCancelled(true);
-					}
-				} else {
+		if(event.getBlock().getType() == Material.CHEST && DatabaseUtils.hasChest(event.getBlock())) if(StorageUtils.gettingNewChest(event.getPlayer())) {
+			if(DatabaseUtils.getChest(event.getBlock().getLocation()).getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())
+					|| event.getPlayer().hasPermission("coldstorage.remove_chests")){
+				if(StorageUtils.deleteChest(event.getPlayer(), event.getBlock())) Chatable.get().sendMessage(event.getPlayer(), Chatable.get().getMessage(ChatUtils.getCodes(), "listeners.break_chest"));
+				else
 					event.setCancelled(true);
-					ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.not_your_chest"));
-				}
 			} else {
 				event.setCancelled(true);
-				ChatUtils.sendMessage(event.getPlayer(), ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.invalid_block_break"));
+				Chatable.get().sendMessage(event.getPlayer(), Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.not_your_chest"));
 			}
+		} else {
+			event.setCancelled(true);
+			Chatable.get().sendMessage(event.getPlayer(), Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.invalid_block_break"));
 		}
 	}
 	
@@ -80,9 +75,7 @@ public class BlockListener implements Listener{
 	public void onEntityExplode(EntityExplodeEvent event) {
 		for(int i = event.blockList().size() - 1; i >= 0; i--) {
 			Block block = event.blockList().get(i);
-			if(block.getType() == Material.CHEST && DatabaseUtils.hasChest(block)) {
-				event.blockList().remove(i);
-			}
+			if(block.getType() == Material.CHEST && DatabaseUtils.hasChest(block)) event.blockList().remove(i);
 		}
 	}
 }

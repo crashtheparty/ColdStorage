@@ -11,85 +11,38 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.ctp.coldstorage.Chatable;
+import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.inventory.Anvilable;
-import org.ctp.coldstorage.inventory.ColdStorageInventory;
-import org.ctp.coldstorage.nms.AnvilGUI;
+import org.ctp.coldstorage.inventory.ColdStorageData;
+import org.ctp.coldstorage.nms.AnvilGUINMS;
 import org.ctp.coldstorage.permissions.Permission;
-import org.ctp.coldstorage.utils.ChatUtils;
 import org.ctp.coldstorage.utils.DatabaseUtils;
-import org.ctp.coldstorage.utils.inventory.InventoryUtils;
+import org.ctp.crashapi.inventory.Pageable;
+import org.ctp.crashapi.utils.ChatUtils;
 
-public class ListPermissions implements ColdStorageInventory, Anvilable{
+public class ListPermissions extends ColdStorageData implements Pageable, Anvilable {
 
 	private final static int PAGING = 36;
-	private OfflinePlayer player, admin;
-	private Player show;
-	private Inventory inventory;
-	private boolean opening = false, editing = false;
 	private int page = 1;
 	
-	public ListPermissions(OfflinePlayer player) {
-		this.player = player;
-		if(this.player instanceof Player) {
-			setShow((Player) this.player); 
-		}
+	public ListPermissions(Player player) {
+		super(player);
 	}
 	
-	public ListPermissions(OfflinePlayer player, OfflinePlayer admin) {
-		this.player = player;
-		this.admin = admin;
-		if(this.admin != null && this.admin instanceof Player) {
-			setShow((Player) this.admin); 
-		} else {
-			setShow((Player) this.player); 
-		}
-	}
-
-	@Override
-	public OfflinePlayer getPlayer() {
-		return player;
-	}
-
-	@Override
-	public void setPlayer(OfflinePlayer player) {
-		this.player = player;
-	}
-
-	@Override
-	public OfflinePlayer getAdmin() {
-		return admin;
-	}
-
-	@Override
-	public void setAdmin(OfflinePlayer player) {
-		this.admin = player;
-	}
-
-	@Override
-	public Player getShow() {
-		return show;
-	}
-
-	@Override
-	public void setShow(Player player) {
-		this.show = player;
-	}
-
-	@Override
-	public Inventory getInventory() {
-		return inventory;
+	public ListPermissions(Player player, OfflinePlayer editing) {
+		super(player, editing);
 	}
 
 	@Override
 	public void setInventory() {
 		List<Permission> permissions = DatabaseUtils.getPermissions();
 		Inventory inv = null;
-		if(PAGING >= permissions.size() && page == 1) {
-			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(getCodes(), "inventory.listpermissions.title"));
-		} else {
+		if(PAGING >= permissions.size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.listpermissions.title"));
+		else {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%page%", page);
-			inv = Bukkit.createInventory(null, 54, ChatUtils.getMessage(codes, "inventory.listpermissions.title_paginated"));
+			inv = Bukkit.createInventory(null, 54, getChat().getMessage(codes, "inventory.listpermissions.title_paginated"));
 		}
 		inv = open(inv);
 		
@@ -102,12 +55,12 @@ public class ListPermissions implements ColdStorageInventory, Anvilable{
 			ItemMeta permissionItemMeta = permissionItem.getItemMeta();
 			HashMap<String, Object> permissionCodes = getCodes();
 			permissionCodes.put("%permission%", permission.getPermission());
-			permissionItemMeta.setDisplayName(ChatUtils.getMessage(permissionCodes, "inventory.listpermissions.permission"));
+			permissionItemMeta.setDisplayName(getChat().getMessage(permissionCodes, "inventory.listpermissions.permission"));
 			List<String> lore = new ArrayList<String>();
 			HashMap<String, Object> loreCodes = getCodes();
 			loreCodes.put("%check_order%", permission.getCheckOrder());
 			loreCodes.put("%num_storages%", permission.getNumStorages());
-			lore.addAll(ChatUtils.getMessages(loreCodes, "inventory.listpermissions.permission_lore"));
+			lore.addAll(getChat().getMessages(loreCodes, "inventory.listpermissions.permission_lore"));
 			permissionItemMeta.setLore(lore);
 			permissionItem.setItemMeta(permissionItemMeta);
 			inv.setItem(i, permissionItem);
@@ -115,36 +68,36 @@ public class ListPermissions implements ColdStorageInventory, Anvilable{
 
 		ItemStack create = new ItemStack(Material.BOOK);
 		ItemMeta createMeta = create.getItemMeta();
-		createMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.create_remove.create_permission"));
+		createMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.create_remove.create_permission"));
 		create.setItemMeta(createMeta);
 		inv.setItem(50, create);
 		
 		ItemStack back = new ItemStack(Material.ARROW);
 		ItemMeta backMeta = back.getItemMeta();
-		backMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.go_back"));
+		backMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.go_back"));
 		back.setItemMeta(backMeta);
 		inv.setItem(48, back);
 		
 		if(permissions.size() > PAGING * page) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextPageMeta = nextPage.getItemMeta();
-			nextPageMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.next_page"));
+			nextPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.next_page"));
 			nextPage.setItemMeta(nextPageMeta);
 			inv.setItem(53, nextPage);
 		}
 		if(page != 1) {
 			ItemStack prevPage = new ItemStack(Material.ARROW);
 			ItemMeta prevPageMeta = prevPage.getItemMeta();
-			prevPageMeta.setDisplayName(ChatUtils.getMessage(getCodes(), "inventory.pagination.previous_page"));
+			prevPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.previous_page"));
 			prevPage.setItemMeta(prevPageMeta);
 			inv.setItem(45, prevPage);
 		}
 	}
 	
 	public void createNew() {
-		editing = true;
-		inventory = null;
-		AnvilGUI.createAnvil(show, this, false);
+		setEdit(true);
+		setInventoryNull();
+		AnvilGUINMS.createAnvil(getPlayer(), this, false);
 	}
 	
 	public void viewPermission(int slot) {
@@ -153,145 +106,67 @@ public class ListPermissions implements ColdStorageInventory, Anvilable{
 		if(permissions.size() > num) {
 			Permission permission = permissions.get(num);
 			close(false);
-			InventoryUtils.addInventory(show, new ViewPermission(player, admin, permission));
+			ColdStorage.getPlugin().addInventory(new ViewPermission(getPlayer(), getEditing(), permission));
 			return;
 		}
-		ChatUtils.sendMessage(show, ChatUtils.getMessage(getCodes(), "exceptions.permission_does_not_exist"));
+		getChat().sendMessage(getPlayer(), getChat().getMessage(getCodes(), "exceptions.permission_does_not_exist"));
 		setInventory();
 	}
 	
 	public void viewAdminList() {
 		close(false);
-		InventoryUtils.addInventory(show, new AdminList(player, admin));
+		ColdStorage.getPlugin().addInventory(new AdminList(getPlayer(), getEditing()));
 	}
 	
+	@Override
 	public int getPage() {
 		return page;
-	}
-	
-	public void changePage(int page) {
-		this.page = page;
-	}
-
-	@Override
-	public void close(boolean external) {
-		if(InventoryUtils.getInventory(show) != null) {
-			if(!editing) {
-				InventoryUtils.removeInventory(show);
-			}
-			if(!external) {
-				show.closeInventory();
-			}
-		}
-	}
-
-	@Override
-	public Inventory open(Inventory inv) {
-		opening = true;
-		if(inventory == null) {
-			inventory = inv;
-			show.openInventory(inv);
-		} else {
-			if(inv.getSize() == inventory.getSize()) {
-				inv = show.getOpenInventory().getTopInventory();
-				inventory = inv;
-			} else {
-				inventory = inv;
-				show.openInventory(inv);
-			}
-		}
-		for(int i = 0; i < inventory.getSize(); i++) {
-			inventory.setItem(i, new ItemStack(Material.AIR));
-		}
-		if(opening) {
-			opening = false;
-		}
-		return inv;
-	}
-
-	@Override
-	public boolean isOpening() {
-		return opening;
-	}
-
-	@Override
-	public boolean isEditing() {
-		return editing;
-	}
-
-	@Override
-	public void setEditing(boolean editing) {
-		this.editing = editing;
 	}
 
 	@Override
 	public void setItemName(String name) {
-		editing = false;
+		setEdit(false);
 		name = name.replace(' ', '_').toLowerCase();
 		String check = name.toString();
 		check = check.replaceAll("[^a-zA-Z0-9\\-\\_]", "");
 		if(!check.equals(name)) {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%name%", name);
-			ChatUtils.sendMessage(show, ChatUtils.getMessage(codes, "exceptions.invalid_permission_string.1"));
-			ChatUtils.sendMessage(show, ChatUtils.getMessage(getCodes(), "exceptions.invalid_permission_string.2"));
+			getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.invalid_permission_string.1"));
+			getChat().sendMessage(getPlayer(), getChat().getMessage(getCodes(), "exceptions.invalid_permission_string.2"));
 			setInventory();
 			return;
 		}
 		if(DatabaseUtils.getPermission(check) != null) {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%permission%", name);
-			ChatUtils.sendMessage(show, ChatUtils.getMessage(codes, "exceptions.permission_exists"));
+			getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.permission_exists"));
 			setInventory();
 			return;
 		}
 		close(false);
 		Permission permission = new Permission(check, 0, 0);
 		DatabaseUtils.addPermission(permission);
-		InventoryUtils.addInventory(show, new ViewPermission(player, admin, permission));
+		ColdStorage.getPlugin().addInventory(new ViewPermission(getPlayer(), getEditing(), permission));
+	}
+
+	@Override
+	public ChatUtils getChat() {
+		return Chatable.get();
+	}
+
+	@Override
+	public void setPage(int page) {
+		this.page = page;
+		setInventory();
 	}
 
 	@Override
 	public void setChoice(String choice) {
-		
-	}
-
-	@Override
-	public HashMap<String, Object> getCodes() {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		return codes;
-	}
-	
-	public HashMap<String, Object> getCodes(String string, Object object) {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		codes.put(string, object);
-		return codes;
-	}
-	
-	public HashMap<String, Object> getCodes(HashMap<String, Object> objects) {
-		HashMap<String, Object> codes = new HashMap<String, Object>();
-		codes.put("%player%", player.getName());
-		if(admin != null) {
-			codes.put("%admin%", admin.getName());
-		}
-		codes.put("%show%", show.getName());
-		codes.putAll(objects);
-		return codes;
 	}
 
 	@Override
 	public boolean isChoice() {
 		return false;
 	}
-
 }

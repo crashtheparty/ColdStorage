@@ -3,8 +3,9 @@ package org.ctp.coldstorage.storage;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.ctp.coldstorage.utils.ChatUtils;
+import org.ctp.coldstorage.Chatable;
 import org.ctp.coldstorage.utils.DatabaseUtils;
+import org.ctp.crashapi.utils.ChatUtils;
 
 public class Chest {
 
@@ -69,25 +70,24 @@ public class Chest {
 			if(storage.getStorageType() != null) {
 				if(type == ChestType.EXPORT && storage.getStorageType().getMaxExport() <= DatabaseUtils.getChestTypes(storage, ChestType.EXPORT).size()) {
 					if(storage.getStorageType().getMaxExport() == 0) {
-						ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.no_export"));
+						Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.no_export"));
 						return;
 					}
-					ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.too_many_export"));
+					Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.too_many_export"));
 					return;
 				}
 				if(type == ChestType.IMPORT && storage.getStorageType().getMaxImport() <= DatabaseUtils.getChestTypes(storage, ChestType.IMPORT).size()) {
 					if(storage.getStorageType().getMaxImport() == 0) {
-						ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.no_import"));
+						Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.no_import"));
 						return;
 					}
-					ChatUtils.sendMessage(player, ChatUtils.getMessage(ChatUtils.getCodes(), "exceptions.too_many_import"));
+					Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.too_many_import"));
 					return;
 				}
 				DatabaseUtils.addChestType(storage, this, type);
 			}
-		} else {
+		} else
 			DatabaseUtils.deleteChestType(storage, this);
-		}
 	}
 
 	public enum ChestType{

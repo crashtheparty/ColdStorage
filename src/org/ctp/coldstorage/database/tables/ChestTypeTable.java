@@ -1,20 +1,19 @@
 package org.ctp.coldstorage.database.tables;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.ctp.coldstorage.database.Errors;
-import org.ctp.coldstorage.database.SQLite;
+import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.storage.Chest;
 import org.ctp.coldstorage.storage.Chest.ChestType;
 import org.ctp.coldstorage.storage.ChestTypeRecord;
 import org.ctp.coldstorage.storage.Storage;
+import org.ctp.crashapi.db.Errors;
+import org.ctp.crashapi.db.SQLite;
+import org.ctp.crashapi.db.tables.Table;
 
 public class ChestTypeTable extends Table{
 
@@ -36,11 +35,10 @@ public class ChestTypeTable extends Table{
 					+ " WHERE chest_unique = '" + chest.getUnique() + "' AND storage_unique = '" + storage.getUnique() + "';");
 
 			rs = ps.executeQuery();
-			while (rs.next()) {
+			while (rs.next())
 				type = ChestType.valueOf(rs.getString("type"));
-			}
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -51,7 +49,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -69,11 +67,10 @@ public class ChestTypeTable extends Table{
 					+ " WHERE chest_unique='" + chest.getUnique() + "';");
 
 			rs = ps.executeQuery();
-			while (rs.next()) {
+			while (rs.next())
 				chests.add(new ChestTypeRecord(rs.getString("chest_unique"), rs.getString("storage_unique"), ChestType.valueOf(rs.getString("type"))));
-			}
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -84,7 +81,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -102,11 +99,10 @@ public class ChestTypeTable extends Table{
 					+ " WHERE storage_unique = '" + storage.getUnique() + "' AND type='" + type.name() + "';");
 
 			rs = ps.executeQuery();
-			while (rs.next()) {
+			while (rs.next())
 				chests.add(new ChestTypeRecord(rs.getString("chest_unique"), rs.getString("storage_unique"), type));
-			}
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -117,7 +113,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -135,11 +131,10 @@ public class ChestTypeTable extends Table{
 					+ " WHERE type='" + type.name() + "';");
 
 			rs = ps.executeQuery();
-			while (rs.next()) {
+			while (rs.next())
 				chests.add(new ChestTypeRecord(rs.getString("chest_unique"), rs.getString("storage_unique"), type));
-			}
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -150,7 +145,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -168,11 +163,10 @@ public class ChestTypeTable extends Table{
 					+ " WHERE storage_unique = '" + storage.getUnique() + "' AND type='" + type.name() + "';");
 
 			rs = ps.executeQuery();
-			while (rs.next()) {
+			while (rs.next())
 				chests.add(rs.getString("chest_unique"));
-			}
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -183,7 +177,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -203,9 +197,7 @@ public class ChestTypeTable extends Table{
 			ps.setString(2, storage.getUnique());
 			rs = ps.executeQuery();
 			
-			if (rs.next()) {
-				found = rs.getBoolean(1); // "found" column
-			}
+			if (rs.next()) found = rs.getBoolean(1); // "found" column
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -217,7 +209,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -228,34 +220,32 @@ public class ChestTypeTable extends Table{
 		Connection conn = null;
 		PreparedStatement ps = null;
 		boolean hasRecord = hasChestType(chest, storage);
-		if(hasRecord) {
+		if(hasRecord) try {
+			conn = getDb().getSQLConnection();
+			ps = conn.prepareStatement("UPDATE " + this.getName() + " SET type = ? WHERE chest_unique = ? AND storage_unique = ?");
+
+			ps.setString(1, type.name()); 
+			
+			ps.setString(2, chest.getUnique());
+			ps.setString(3, storage.getUnique());
+			
+			ps.executeUpdate();
+		} catch (SQLException ex) {
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+					ex);
+		} finally {
 			try {
-				conn = getDb().getSQLConnection();
-				ps = conn.prepareStatement("UPDATE " + this.getName() + " SET type = ? WHERE chest_unique = ? AND storage_unique = ?");
-	
-				ps.setString(1, type.name()); 
-				
-				ps.setString(2, chest.getUnique());
-				ps.setString(3, storage.getUnique());
-				
-				ps.executeUpdate();
+				if (ps != null)
+					ps.close();
+				if (conn != null)
+					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
-						ex);
-			} finally {
-				try {
-					if (ps != null)
-						ps.close();
-					if (conn != null)
-						conn.close();
-				} catch (SQLException ex) {
-					getDb().getPlugin().getLogger().log(Level.SEVERE,
-							Errors.sqlConnectionClose(), ex);
-				}
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
+						Errors.sqlConnectionClose(), ex);
 			}
-		} else {
-			getDb().getPlugin().getLogger().log(Level.WARNING, "Missing possible record with chest type: " + type.name());
 		}
+		else
+			ColdStorage.getPlugin().getLogger().log(Level.WARNING, "Missing possible record with chest type: " + type.name());
 		return;
 	}
 	
@@ -274,7 +264,7 @@ public class ChestTypeTable extends Table{
 			
 			ps.execute();
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -283,7 +273,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}
@@ -303,7 +293,7 @@ public class ChestTypeTable extends Table{
 			
 			ps.execute();
 		} catch (SQLException ex) {
-			getDb().getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
+			ColdStorage.getPlugin().getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(),
 					ex);
 		} finally {
 			try {
@@ -312,7 +302,7 @@ public class ChestTypeTable extends Table{
 				if (conn != null)
 					conn.close();
 			} catch (SQLException ex) {
-				getDb().getPlugin().getLogger().log(Level.SEVERE,
+				ColdStorage.getPlugin().getLogger().log(Level.SEVERE,
 						Errors.sqlConnectionClose(), ex);
 			}
 		}

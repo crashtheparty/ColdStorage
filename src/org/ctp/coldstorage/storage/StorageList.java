@@ -6,7 +6,7 @@ import java.util.List;
 import org.bukkit.OfflinePlayer;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.database.tables.CacheTable;
-import org.ctp.coldstorage.database.tables.Table;
+import org.ctp.crashapi.db.tables.Table;
 
 public class StorageList {
 
@@ -62,11 +62,8 @@ public class StorageList {
 	}
 	
 	public static StorageList getList(OfflinePlayer player) {
-		for(StorageList list : STORAGE_LISTS) {
-			if(list.getPlayer().equals(player)) {
-				return list;
-			}
-		}
+		for(StorageList list : STORAGE_LISTS)
+			if(list.getPlayer().equals(player)) return list;
 		return new StorageList(player);
 	}
 }

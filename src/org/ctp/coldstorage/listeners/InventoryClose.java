@@ -4,29 +4,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.inventory.Anvilable;
-import org.ctp.coldstorage.inventory.ColdStorageInventory;
-import org.ctp.coldstorage.utils.inventory.InventoryUtils;
+import org.ctp.coldstorage.inventory.ColdStorageData;
+import org.ctp.crashapi.inventory.InventoryData;
 
 public class InventoryClose implements Listener{
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		Player player = null;
-		if (event.getPlayer() instanceof Player) {
-			player = (Player) event.getPlayer();
-		} else {
+		if (event.getPlayer() instanceof Player) player = (Player) event.getPlayer();
+		else
 			return;
-		}
-		ColdStorageInventory csInv = InventoryUtils.getInventory(player);
+		InventoryData csInv = ColdStorage.getPlugin().getInventory(player);
 		
 		if(csInv != null) {
-			if(csInv instanceof Anvilable && ((Anvilable) csInv).isEditing()){
-				return;
-			}
-			if(!csInv.isOpening()) {
-				InventoryUtils.removeInventory(player);
-			}
+			if(csInv instanceof Anvilable && ((Anvilable) csInv).willEdit()) return;
+			if(csInv instanceof ColdStorageData && !((ColdStorageData) csInv).isOpening()) ColdStorage.getPlugin().removeInventory(csInv);
 		}
 	}
 }
