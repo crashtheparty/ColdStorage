@@ -6,7 +6,7 @@ public class ChestTypeRecord {
 
 	private String chestUUID, storageUUID;
 	private ChestType type;
-	
+
 	public ChestTypeRecord(String chestUUID, String storageUUID, ChestType type) {
 		this.setChestUUID(chestUUID);
 		this.setStorageUUID(storageUUID);

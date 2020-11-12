@@ -25,11 +25,11 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 
 	private final static int PAGING = 36;
 	private int page = 1;
-	
+
 	public ListPermissions(Player player) {
 		super(player);
 	}
-	
+
 	public ListPermissions(Player player, OfflinePlayer editing) {
 		super(player, editing);
 	}
@@ -38,19 +38,19 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 	public void setInventory() {
 		List<Permission> permissions = DatabaseUtils.getPermissions();
 		Inventory inv = null;
-		if(PAGING >= permissions.size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.listpermissions.title"));
+		if (PAGING >= permissions.size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.listpermissions.title"));
 		else {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%page%", page);
 			inv = Bukkit.createInventory(null, 54, getChat().getMessage(codes, "inventory.listpermissions.title_paginated"));
 		}
 		inv = open(inv);
-		
+
 		for(int i = 0; i < PAGING; i++) {
 			int permissionNum = i + (PAGING * (page - 1));
-			if(permissions.size() <= permissionNum) break;
+			if (permissions.size() <= permissionNum) break;
 			Permission permission = permissions.get(permissionNum);
-			
+
 			ItemStack permissionItem = new ItemStack(Material.NAME_TAG);
 			ItemMeta permissionItemMeta = permissionItem.getItemMeta();
 			HashMap<String, Object> permissionCodes = getCodes();
@@ -71,21 +71,21 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 		createMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.create_remove.create_permission"));
 		create.setItemMeta(createMeta);
 		inv.setItem(50, create);
-		
+
 		ItemStack back = new ItemStack(Material.ARROW);
 		ItemMeta backMeta = back.getItemMeta();
 		backMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.go_back"));
 		back.setItemMeta(backMeta);
 		inv.setItem(48, back);
-		
-		if(permissions.size() > PAGING * page) {
+
+		if (permissions.size() > PAGING * page) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextPageMeta = nextPage.getItemMeta();
 			nextPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.next_page"));
 			nextPage.setItemMeta(nextPageMeta);
 			inv.setItem(53, nextPage);
 		}
-		if(page != 1) {
+		if (page != 1) {
 			ItemStack prevPage = new ItemStack(Material.ARROW);
 			ItemMeta prevPageMeta = prevPage.getItemMeta();
 			prevPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.previous_page"));
@@ -93,17 +93,17 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 			inv.setItem(45, prevPage);
 		}
 	}
-	
+
 	public void createNew() {
 		setEdit(true);
 		setInventoryNull();
 		AnvilGUINMS.createAnvil(getPlayer(), this, false);
 	}
-	
+
 	public void viewPermission(int slot) {
 		int num = slot + (PAGING * (page - 1));
 		List<Permission> permissions = DatabaseUtils.getPermissions();
-		if(permissions.size() > num) {
+		if (permissions.size() > num) {
 			Permission permission = permissions.get(num);
 			close(false);
 			ColdStorage.getPlugin().addInventory(new ViewPermission(getPlayer(), getEditing(), permission));
@@ -112,12 +112,12 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 		getChat().sendMessage(getPlayer(), getChat().getMessage(getCodes(), "exceptions.permission_does_not_exist"));
 		setInventory();
 	}
-	
+
 	public void viewAdminList() {
 		close(false);
 		ColdStorage.getPlugin().addInventory(new AdminList(getPlayer(), getEditing()));
 	}
-	
+
 	@Override
 	public int getPage() {
 		return page;
@@ -129,7 +129,7 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 		name = name.replace(' ', '_').toLowerCase();
 		String check = name.toString();
 		check = check.replaceAll("[^a-zA-Z0-9\\-\\_]", "");
-		if(!check.equals(name)) {
+		if (!check.equals(name)) {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%name%", name);
 			getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.invalid_permission_string.1"));
@@ -137,7 +137,7 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 			setInventory();
 			return;
 		}
-		if(DatabaseUtils.getPermission(check) != null) {
+		if (DatabaseUtils.getPermission(check) != null) {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%permission%", name);
 			getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.permission_exists"));
@@ -162,8 +162,7 @@ public class ListPermissions extends ColdStorageData implements Pageable, Anvila
 	}
 
 	@Override
-	public void setChoice(String choice) {
-	}
+	public void setChoice(String choice) {}
 
 	@Override
 	public boolean isChoice() {

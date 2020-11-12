@@ -12,22 +12,24 @@ public class Chest {
 	private String unique;
 	private Location loc, doubleLoc;
 	private OfflinePlayer player;
-	
+
 	public Chest(String unique, OfflinePlayer player, Location loc) {
 		setUnique(unique);
 		setPlayer(player);
 		setLoc(loc);
 	}
-	
+
 	public Chest(String unique, OfflinePlayer player, Location loc, Location doubleLoc) {
 		setUnique(unique);
 		setPlayer(player);
 		setLoc(loc);
 		setDoubleLoc(doubleLoc);
 	}
+
 	public Chest(Location loc) {
 		setLoc(loc);
 	}
+
 	public Chest(Location loc, Location doubleLoc) {
 		setLoc(loc);
 		setDoubleLoc(doubleLoc);
@@ -48,7 +50,7 @@ public class Chest {
 	public void setDoubleLoc(Location doubleLoc) {
 		this.doubleLoc = doubleLoc;
 	}
-	
+
 	public String getUnique() {
 		return unique;
 	}
@@ -64,20 +66,20 @@ public class Chest {
 	public void setPlayer(OfflinePlayer player) {
 		this.player = player;
 	}
-	
+
 	public void toggle(Storage storage, ChestType type, Player player) {
-		if(DatabaseUtils.getChestType(storage, this) == null) {
-			if(storage.getStorageType() != null) {
-				if(type == ChestType.EXPORT && storage.getStorageType().getMaxExport() <= DatabaseUtils.getChestTypes(storage, ChestType.EXPORT).size()) {
-					if(storage.getStorageType().getMaxExport() == 0) {
+		if (DatabaseUtils.getChestType(storage, this) == null) {
+			if (storage.getStorageType() != null) {
+				if (type == ChestType.EXPORT && storage.getStorageType().getMaxExport() <= DatabaseUtils.getChestTypes(storage, ChestType.EXPORT).size()) {
+					if (storage.getStorageType().getMaxExport() == 0) {
 						Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.no_export"));
 						return;
 					}
 					Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.too_many_export"));
 					return;
 				}
-				if(type == ChestType.IMPORT && storage.getStorageType().getMaxImport() <= DatabaseUtils.getChestTypes(storage, ChestType.IMPORT).size()) {
-					if(storage.getStorageType().getMaxImport() == 0) {
+				if (type == ChestType.IMPORT && storage.getStorageType().getMaxImport() <= DatabaseUtils.getChestTypes(storage, ChestType.IMPORT).size()) {
+					if (storage.getStorageType().getMaxImport() == 0) {
 						Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "exceptions.no_import"));
 						return;
 					}
@@ -90,7 +92,7 @@ public class Chest {
 			DatabaseUtils.deleteChestType(storage, this);
 	}
 
-	public enum ChestType{
+	public enum ChestType {
 		EXPORT(), IMPORT();
 	}
 }

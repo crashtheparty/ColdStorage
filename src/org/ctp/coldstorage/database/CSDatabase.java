@@ -35,32 +35,32 @@ public class CSDatabase extends SQLite {
 		addTable(new StorageTypeTable(this));
 	}
 
+	@Override
 	public <T> T getTable(Class<T> cls) {
 		return super.getTable(cls);
 	}
 
 	public void addDefault() {
 		StorageType type = new StorageType("Basic", 0, 0, 1000, new ItemStack(Material.DIAMOND, 4), 2000000);
-		
+
 		DatabaseUtils.addStorageType(Bukkit.getOfflinePlayer(UUID.fromString("58ca0e55-7809-4d91-9431-7889209cc77e")), type);
 	}
 
 	@Override
 	public Connection getSQLConnection() {
 		File dataFolder = new File(getInstance().getDataFolder(), getDBName() + ".db");
-		if (!dataFolder.exists()) 
-			newInitialized = true;
+		if (!dataFolder.exists()) newInitialized = true;
 		return super.getSQLConnection();
 	}
-	
+
 	@Override
 	protected void initialize() {
 		super.initialize("storages");
-		
-		if(newInitialized) addDefault();
+
+		if (newInitialized) addDefault();
 		else
 			migrateTables();
-		
+
 		migrateData();
 	}
 
@@ -72,33 +72,27 @@ public class CSDatabase extends SQLite {
 		ResultSet rs = null;
 		StorageType type = ColdStorage.getPlugin().getConfiguration().getLegacyData();
 		List<Storage> storages = new ArrayList<Storage>();
-		if(type != null) {
+		if (type != null) {
 			try {
 				conn = getSQLConnection();
 				ps = conn.prepareStatement("SELECT * FROM storages");
 
 				rs = ps.executeQuery();
 				while (rs.next())
-					storages.add(new Storage(Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("player"))), 
-							rs.getString("storage_unique"), rs.getString("material"), rs.getString("metadata"), 
-							type.getType(), rs.getString("material"), rs.getInt("amount"), rs.getInt("order_by"), true));
+					storages.add(new Storage(Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("player"))), rs.getString("storage_unique"), rs.getString("material"), rs.getString("metadata"), type.getType(), rs.getString("material"), rs.getInt("amount"), rs.getInt("order_by"), true));
 			} catch (SQLException ex) {
-				
+
 			} finally {
 				try {
-					if (ps != null)
-						ps.close();
-					if (rs != null)
-						rs.close();
-					if (conn != null)
-						conn.close();
+					if (ps != null) ps.close();
+					if (rs != null) rs.close();
+					if (conn != null) conn.close();
 				} catch (SQLException ex) {
-					getInstance().getLogger().log(Level.SEVERE,
-							Errors.sqlConnectionClose(), ex);
+					getInstance().getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
 				}
 			}
 			DatabaseUtils.addStorageType(Bukkit.getOfflinePlayer(UUID.fromString("58ca0e55-7809-4d91-9431-7889209cc77e")), type);
-			if(storages.size() > 0) for(Storage storage : storages) {
+			if (storages.size() > 0) for(Storage storage: storages) {
 				DatabaseUtils.addCache(Bukkit.getOfflinePlayer(UUID.fromString("58ca0e55-7809-4d91-9431-7889209cc77e")), storage);
 				DatabaseUtils.updateCache(Bukkit.getOfflinePlayer(UUID.fromString("58ca0e55-7809-4d91-9431-7889209cc77e")), storage);
 			}
@@ -109,36 +103,33 @@ public class CSDatabase extends SQLite {
 
 				ps2.execute();
 			} catch (SQLException ex) {
-				
+
 			} finally {
 				try {
-					if (ps2 != null)
-						ps2.close();
-					if (conn2 != null)
-						conn2.close();
+					if (ps2 != null) ps2.close();
+					if (conn2 != null) conn2.close();
 				} catch (SQLException ex) {
-					getInstance().getLogger().log(Level.SEVERE,
-							Errors.sqlConnectionClose(), ex);
+					getInstance().getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
 				}
 			}
 		}
 	}
-	
+
 	public void migrateData() {
 		YamlConfig config = ColdStorage.getPlugin().getConfigurations().getConfig().getConfig();
-		if(config.getBoolean("migrate_material_names")) {
+		if (config.getBoolean("migrate_material_names")) {
 			List<OfflinePlayer> players = DatabaseUtils.getOfflinePlayers();
-			for(OfflinePlayer player : players) {
+			for(OfflinePlayer player: players) {
 				StorageList storageList = StorageList.getList(player);
 				List<Cache> caches = new ArrayList<Cache>();
 				caches.addAll(storageList.getDrafts());
 				caches.addAll(storageList.getStorages());
-				for(Cache cache : caches) {
+				for(Cache cache: caches) {
 					cache.setMaterial(MaterialUtils.migrateMaterial(cache.getMaterialName()));
 					DatabaseUtils.updateCache(player, cache);
 				}
 			}
-			
+
 			config.set("migrate_material_names", false);
 			config.saveConfig();
 		}

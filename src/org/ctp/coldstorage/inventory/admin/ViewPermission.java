@@ -21,7 +21,7 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 	private boolean choice;
 	private Permission permission;
 	private String editType;
-	
+
 	public ViewPermission(Player player, Permission permission) {
 		super(player);
 		this.permission = permission;
@@ -55,7 +55,7 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 		checkOrderMeta.setDisplayName(getChat().getMessage(checkCodes, "inventory.viewpermission.check_order"));
 		checkOrder.setItemMeta(checkOrderMeta);
 		inv.setItem(12, checkOrder);
-		
+
 		ItemStack numAmount = new ItemStack(Material.CHEST);
 		ItemMeta numAmountMeta = numAmount.getItemMeta();
 		HashMap<String, Object> storageCodes = getCodes();
@@ -63,32 +63,32 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 		numAmountMeta.setDisplayName(getChat().getMessage(storageCodes, "inventory.viewpermission.num_storages"));
 		numAmount.setItemMeta(numAmountMeta);
 		inv.setItem(14, numAmount);
-		
+
 		ItemStack back = new ItemStack(Material.ARROW);
 		ItemMeta backMeta = back.getItemMeta();
 		backMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.go_back"));
 		back.setItemMeta(backMeta);
 		inv.setItem(18, back);
-		
+
 		ItemStack delete = new ItemStack(Material.REDSTONE_BLOCK);
 		ItemMeta deleteMeta = delete.getItemMeta();
 		deleteMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.create_remove.delete"));
 		delete.setItemMeta(deleteMeta);
 		inv.setItem(26, delete);
 	}
-	
+
 	public void openAnvil(String type) {
 		setEdit(true);
 		editType = type;
 		setInventoryNull();
 		AnvilGUINMS.createAnvil(getPlayer(), this, false);
 	}
-	
+
 	public void viewPermissionList() {
 		close(false);
 		ColdStorage.getPlugin().addInventory(new ListPermissions(getPlayer(), getEditing()));
 	}
-	
+
 	public void confirmDelete() {
 		setEdit(true);
 		setInventoryNull();
@@ -98,11 +98,11 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 	@Override
 	public void setItemName(String name) {
 		setEdit(false);
-		if(editType != null) if(editType.equals("check_order")) {
+		if (editType != null) if (editType.equals("check_order")) {
 			int checkOrder = 0;
 			try {
 				checkOrder = Integer.parseInt(name);
-			} catch(NumberFormatException ex) {
+			} catch (NumberFormatException ex) {
 				HashMap<String, Object> codes = getCodes();
 				codes.put("%num%", name);
 				getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.number_format"));
@@ -119,14 +119,14 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 			editType = null;
 			try {
 				numStorage = Integer.parseInt(name);
-			} catch(NumberFormatException ex) {
+			} catch (NumberFormatException ex) {
 				HashMap<String, Object> codes = getCodes();
 				codes.put("%num%", name);
 				getChat().sendMessage(getPlayer(), getChat().getMessage(codes, "exceptions.number_format"));
 				setInventory();
 				return;
 			}
-			if(numStorage < -1) {
+			if (numStorage < -1) {
 				HashMap<String, Object> codes = getCodes();
 				codes.put("%num%", numStorage);
 				codes.put("%lowest%", -1);
@@ -156,7 +156,7 @@ public class ViewPermission extends ColdStorageData implements Anvilable {
 	@Override
 	public void setChoice(String choice) {
 		this.choice = false;
-		if(choice.equals("confirm")) {
+		if (choice.equals("confirm")) {
 			DatabaseUtils.removePermission(permission.getPermission(), getPlayer());
 			viewPermissionList();
 			return;

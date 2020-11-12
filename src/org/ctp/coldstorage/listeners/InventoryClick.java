@@ -17,7 +17,7 @@ import org.ctp.coldstorage.inventory.storage.ViewStorage;
 import org.ctp.coldstorage.utils.inventory.InventoryClickUtils;
 import org.ctp.crashapi.inventory.InventoryData;
 
-public class InventoryClick implements Listener{
+public class InventoryClick implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
@@ -26,15 +26,14 @@ public class InventoryClick implements Listener{
 		else
 			return;
 		InventoryData csInv = ColdStorage.getPlugin().getInventory(player);
-		
-		if(csInv != null) {
-			if(csInv instanceof Anvilable) if(((Anvilable) csInv).willEdit()) return;
+
+		if (csInv != null) {
+			if (csInv instanceof Anvilable) if (((Anvilable) csInv).willEdit()) return;
 			Inventory inv = event.getClickedInventory();
-			if (inv == null)
-				return;
+			if (inv == null) return;
 			event.setCancelled(true);
-			
-			if(csInv instanceof ListStorage) InventoryClickUtils.viewStorageList(event, player, (ListStorage) csInv);
+
+			if (csInv instanceof ListStorage) InventoryClickUtils.viewStorageList(event, player, (ListStorage) csInv);
 			else if (csInv instanceof ViewStorage) InventoryClickUtils.viewStorage(event, player, (ViewStorage) csInv);
 			else if (csInv instanceof DraftList) InventoryClickUtils.viewDraftList(event, player, (DraftList) csInv);
 			else if (csInv instanceof ViewDraft) InventoryClickUtils.viewDraft(event, player, (ViewDraft) csInv);

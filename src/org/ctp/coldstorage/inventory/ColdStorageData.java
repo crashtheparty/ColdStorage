@@ -19,16 +19,17 @@ public abstract class ColdStorageData implements InventoryData, Chatable {
 	private final OfflinePlayer editing;
 	private Inventory inventory;
 	private boolean opening = false, edit = false;
-	
+
 	public ColdStorageData(Player player) {
 		this.player = player;
 		this.editing = player;
 	}
-	
+
 	public ColdStorageData(Player player, OfflinePlayer editing) {
 		this.player = player;
 		this.editing = editing;
 	}
+
 	@Override
 	public Player getPlayer() {
 		return player;
@@ -47,7 +48,7 @@ public abstract class ColdStorageData implements InventoryData, Chatable {
 	public void setInventoryNull() {
 		inventory = null;
 	}
-	
+
 	@Override
 	public Inventory open(Inventory inv) {
 		opening = true;
@@ -101,14 +102,14 @@ public abstract class ColdStorageData implements InventoryData, Chatable {
 	public void setEdit(boolean edit) {
 		this.edit = edit;
 	}
-	
+
 	public HashMap<String, Object> getCodes() {
 		HashMap<String, Object> codes = new HashMap<String, Object>();
 		codes.put("%player%", player.getName());
 		codes.put("%editing%", editing.getName());
 		return codes;
 	}
-	
+
 	public HashMap<String, Object> getCodes(String string, Object object) {
 		HashMap<String, Object> codes = new HashMap<String, Object>();
 		codes.put("%player%", player.getName());
@@ -116,7 +117,7 @@ public abstract class ColdStorageData implements InventoryData, Chatable {
 		codes.put(string, object);
 		return codes;
 	}
-	
+
 	public HashMap<String, Object> getCodes(HashMap<String, Object> objects) {
 		HashMap<String, Object> codes = new HashMap<String, Object>();
 		codes.put("%player%", player.getName());

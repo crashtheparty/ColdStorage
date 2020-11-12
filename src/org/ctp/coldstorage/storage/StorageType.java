@@ -16,7 +16,7 @@ public class StorageType {
 	private int maxAmountBase;
 	private ItemStack itemCost;
 	private int maxImport, maxExport;
-	
+
 	public StorageType(String type, int maxExport, int maxImport, double vaultCost, ItemStack itemCost, int maxAmountBase) {
 		setType(type);
 		setMaxExport(maxExport);
@@ -49,36 +49,32 @@ public class StorageType {
 	public void setItemCost(ItemStack itemCost) {
 		this.itemCost = itemCost;
 	}
-	
+
 	public static StorageType getStorageType(String type) {
-		for(StorageType s : TYPES) {
-			if(s.getType().equals(type)) {
-				return s;
-			}
+		for(StorageType s: TYPES) {
+			if (s.getType().equals(type)) { return s; }
 		}
 		return null;
 	}
-	
-	public static List<StorageType> getAll(){
+
+	public static List<StorageType> getAll() {
 		return TYPES;
 	}
-	
+
 	public static void add(StorageType type) {
-		if(!TYPES.contains(type)) {
+		if (!TYPES.contains(type)) {
 			TYPES.add(type);
 		}
 	}
-	
+
 	public static boolean remove(String type) {
 		StorageType storage = null;
-		for(StorageType s : TYPES) {
-			if(s.getType().equals(type)) {
+		for(StorageType s: TYPES) {
+			if (s.getType().equals(type)) {
 				storage = s;
 			}
 		}
-		if(storage != null) {
-			return TYPES.remove(storage);
-		}
+		if (storage != null) { return TYPES.remove(storage); }
 		return false;
 	}
 
@@ -93,9 +89,9 @@ public class StorageType {
 	public List<String> getPermissions() {
 		return DatabaseUtils.getStringPermissions(this);
 	}
-	
+
 	public void togglePermission(Permission permission, OfflinePlayer player) {
-		if(getPermissions().contains(permission.getPermission())) {
+		if (getPermissions().contains(permission.getPermission())) {
 			DatabaseUtils.removePermissionFromType(this, permission.getPermission(), player);
 		} else {
 			DatabaseUtils.addPermissionToType(this, permission.getPermission(), player);

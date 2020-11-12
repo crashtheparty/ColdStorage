@@ -21,7 +21,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class CommandUtils {
-	
+
 	public static boolean addChest(CommandSender sender, CrashCommand details, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
@@ -35,27 +35,26 @@ public class CommandUtils {
 			Chatable.get().sendWarning(Chatable.get().getMessage(ChatUtils.getCodes(), "commands.no_console"));
 		return false;
 	}
-	
+
 	public static boolean admin(CommandSender sender, CrashCommand details, String[] args) {
-		if(sender instanceof Player) {
+		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if(player.hasPermission(details.getPermission())) {
+			if (player.hasPermission(details.getPermission())) {
 				Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "commands.admin"));
 				AdminList list = new AdminList(player);
 				ColdStorage.getPlugin().addInventory(list);
 				return true;
 			} else
-				Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "commands.no_permission")); 
-		}
-		else
+				Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "commands.no_permission"));
+		} else
 			Chatable.get().sendWarning(Chatable.get().getMessage(ChatUtils.getCodes(), "commands.no_console"));
 		return false;
 	}
-	
+
 	public static boolean open(CommandSender sender, CrashCommand details, String[] args) {
-		if(sender instanceof Player) {
+		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if(player.hasPermission(details.getPermission())) {
+			if (player.hasPermission(details.getPermission())) {
 				Chatable.get().sendMessage(player, Chatable.get().getMessage(ChatUtils.getCodes(), "commands.open"));
 				ListStorage list = new ListStorage(player);
 				ColdStorage.getPlugin().addInventory(list);
@@ -66,11 +65,11 @@ public class CommandUtils {
 			Chatable.get().sendWarning(Chatable.get().getMessage(ChatUtils.getCodes(), "commands.no_console"));
 		return false;
 	}
-	
+
 	public static boolean reload(CommandSender sender, CrashCommand details, String[] args) {
 		Player p = null;
 		if (sender instanceof Player) p = (Player) sender;
-		if(sender.hasPermission("coldstorage.reload")) {
+		if (sender.hasPermission("coldstorage.reload")) {
 			ColdStorage.getPlugin().getConfiguration().reload(sender);
 			return true;
 		}

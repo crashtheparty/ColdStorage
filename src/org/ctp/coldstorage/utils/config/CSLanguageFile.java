@@ -12,7 +12,7 @@ public class CSLanguageFile extends CrashLanguageFile {
 	public CSLanguageFile(File dataFolder, Language language) {
 		super(dataFolder, language);
 		File tempFile = CrashConfigUtils.getTempFile(this.getClass(), "/resources/" + language.getLocale() + ".yml");
-		
+
 		YamlConfig config = getConfig();
 		config.getFromConfig();
 

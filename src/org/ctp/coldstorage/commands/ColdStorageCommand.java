@@ -18,7 +18,7 @@ public class ColdStorageCommand implements CommandExecutor, TabCompleter {
 	private final CSCommand reload = new CSCommand("csreload", "commands.aliases.csreload", "commands.descriptions.csreload", "commands.usage.csreload", "coldstorage.reload");
 	private final CSCommand chest = new CSCommand("cschest", "commands.aliases.cschest", "commands.descriptions.cschest", "commands.usage.cschest", "coldstorage.chest");
 	private final CSCommand help = new CSCommand("cshelp", "commands.aliases.cshelp", "commands.descriptions.cshelp", "commands.usage.cshelp", "coldstorage.help");
-	
+
 	public ColdStorageCommand() {
 		commands = new ArrayList<CSCommand>();
 		commands.add(open);

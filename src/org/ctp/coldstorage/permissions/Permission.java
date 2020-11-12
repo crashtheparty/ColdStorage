@@ -4,7 +4,7 @@ public class Permission {
 
 	private String permission;
 	private int checkOrder, numStorages;
-	
+
 	public Permission(String permission, int checkOrder, int numStorages) {
 		this.permission = permission;
 		this.checkOrder = checkOrder;

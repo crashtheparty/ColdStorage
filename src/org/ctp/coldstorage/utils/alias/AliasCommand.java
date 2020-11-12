@@ -40,15 +40,12 @@ final class AliasCommand extends Command {
 
 	@Override
 	public boolean testPermissionSilent(CommandSender target) {
-		if(target instanceof Player) {
-			return ((Player) target).hasPermission(alias.getPermission());
-		}
+		if (target instanceof Player) { return ((Player) target).hasPermission(alias.getPermission()); }
 		return true;
 	}
 
 	public boolean register() throws IllegalStateException {
-		if (registered)
-			throw new IllegalStateException("Command is already registered");
+		if (registered) throw new IllegalStateException("Command is already registered");
 		try {
 			return registered = ((SimpleCommandMap) commandMap.get(Bukkit.getServer())).register(alias.getPrefix(), this);
 		} catch (Exception e) {
@@ -59,10 +56,9 @@ final class AliasCommand extends Command {
 
 	@SuppressWarnings("unchecked")
 	public boolean unregister() throws IllegalStateException {
-		if (!registered)
-			throw new IllegalStateException("Command is not registered");
+		if (!registered) throw new IllegalStateException("Command is not registered");
 		try {
-			((Map<String, Command>) knownCommands.get((SimpleCommandMap) commandMap.get(Bukkit.getServer()))).remove(getName());
+			((Map<String, Command>) knownCommands.get(commandMap.get(Bukkit.getServer()))).remove(getName());
 			registered = false;
 			return true;
 		} catch (Exception e) {
@@ -75,6 +71,7 @@ final class AliasCommand extends Command {
 		return this.alias;
 	}
 
+	@Override
 	public boolean isRegistered() {
 		return this.registered;
 	}

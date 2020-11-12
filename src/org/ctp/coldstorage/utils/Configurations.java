@@ -11,8 +11,8 @@ import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.Serialable;
 import org.ctp.coldstorage.storage.StorageType;
 import org.ctp.coldstorage.utils.config.CSLanguageFile;
+import org.ctp.coldstorage.utils.config.LanguageConfiguration;
 import org.ctp.coldstorage.utils.config.MainConfiguration;
-import org.ctp.crashapi.api.LanguageConfiguration;
 import org.ctp.crashapi.config.CrashConfigurations;
 import org.ctp.crashapi.config.Language;
 import org.ctp.crashapi.config.yaml.YamlConfig;
@@ -20,6 +20,7 @@ import org.ctp.crashapi.db.BackupDB;
 
 public class Configurations implements CrashConfigurations {
 
+	private static boolean INITIALIZING = true;
 	private final static Configurations CONFIGURATIONS = new Configurations();
 	private MainConfiguration CONFIG;
 	private LanguageConfiguration LANGUAGE;
@@ -76,6 +77,8 @@ public class Configurations implements CrashConfigurations {
 		LANGUAGE.setComments(CONFIG.getBoolean("use_comments"));
 		CONFIG.save();
 		LANGUAGE.save();
+
+		INITIALIZING = false;
 	}
 
 	public void reload(CommandSender sender) {
@@ -139,6 +142,10 @@ public class Configurations implements CrashConfigurations {
 
 	public boolean getAnvilEdits() {
 		return CONFIG.getConfig().getBoolean("anvil_edits");
+	}
+
+	public static boolean isInitializing() {
+		return INITIALIZING;
 	}
 
 }

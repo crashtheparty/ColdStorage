@@ -25,7 +25,7 @@ public class EditTypePermissions extends ColdStorageData implements Pageable {
 	private final static int PAGING = 36;
 	private StorageType type;
 	private int page = 1;
-	
+
 	public EditTypePermissions(Player player, StorageType type) {
 		super(player);
 		this.type = type;
@@ -39,7 +39,7 @@ public class EditTypePermissions extends ColdStorageData implements Pageable {
 	@Override
 	public void setInventory() {
 		Inventory inv = null;
-		if(PAGING >= StorageType.getAll().size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.edittypepermissions.title"));
+		if (PAGING >= StorageType.getAll().size() && page == 1) inv = Bukkit.createInventory(null, 54, getChat().getMessage(getCodes(), "inventory.edittypepermissions.title"));
 		else {
 			HashMap<String, Object> codes = getCodes();
 			codes.put("%page%", page);
@@ -47,15 +47,15 @@ public class EditTypePermissions extends ColdStorageData implements Pageable {
 		}
 		inv = open(inv);
 		List<Permission> permissions = DatabaseUtils.getPermissions();
-		
+
 		for(int i = 0; i < PAGING; i++) {
 			int permissionNum = i + (PAGING * (page - 1));
-			if(permissions.size() <= permissionNum) break;
+			if (permissions.size() <= permissionNum) break;
 			Permission permission = permissions.get(permissionNum);
-			
+
 			ItemStack permissionItem = new ItemStack(Material.GOLDEN_APPLE);
 			String selected = getChat().getMessage(getCodes(), "info.false");
-			if(type.getPermissions().contains(permission.getPermission())) {
+			if (type.getPermissions().contains(permission.getPermission())) {
 				permissionItem.setType(Material.ENCHANTED_GOLDEN_APPLE);
 				selected = getChat().getMessage(getCodes(), "info.true");
 			}
@@ -73,21 +73,21 @@ public class EditTypePermissions extends ColdStorageData implements Pageable {
 			permissionItem.setItemMeta(permissionItemMeta);
 			inv.setItem(i, permissionItem);
 		}
-		
+
 		ItemStack back = new ItemStack(Material.ARROW);
 		ItemMeta backMeta = back.getItemMeta();
 		backMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.go_back"));
 		back.setItemMeta(backMeta);
 		inv.setItem(49, back);
 
-		if(permissions.size() > PAGING * page) {
+		if (permissions.size() > PAGING * page) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextPageMeta = nextPage.getItemMeta();
 			nextPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.next_page"));
 			nextPage.setItemMeta(nextPageMeta);
 			inv.setItem(53, nextPage);
 		}
-		if(page != 1) {
+		if (page != 1) {
 			ItemStack prevPage = new ItemStack(Material.ARROW);
 			ItemMeta prevPageMeta = prevPage.getItemMeta();
 			prevPageMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.pagination.previous_page"));
@@ -95,27 +95,27 @@ public class EditTypePermissions extends ColdStorageData implements Pageable {
 			inv.setItem(45, prevPage);
 		}
 	}
-	
+
 	public void togglePermission(int slot) {
 		int num = slot + (PAGING * (page - 1));
 		List<Permission> permissions = DatabaseUtils.getPermissions();
-		if(permissions.size() > num) {
+		if (permissions.size() > num) {
 			Permission permission = permissions.get(num);
 			type.togglePermission(permission, getPlayer());
 		}
 		setInventory();
 	}
-	
+
 	public void editStorageType() {
 		close(false);
 		ColdStorage.getPlugin().addInventory(new EditStorageType(getPlayer(), getEditing(), type));
 	}
-	
+
 	@Override
 	public int getPage() {
 		return page;
 	}
-	
+
 	@Override
 	public void setPage(int page) {
 		this.page = page;

@@ -3,6 +3,7 @@ package org.ctp.coldstorage.utils.config;
 import java.io.File;
 
 import org.ctp.coldstorage.ColdStorage;
+import org.ctp.coldstorage.utils.Configurations;
 import org.ctp.crashapi.CrashAPI;
 import org.ctp.crashapi.CrashAPIPlugin;
 import org.ctp.crashapi.config.Configuration;
@@ -25,7 +26,7 @@ public class MainConfiguration extends Configuration {
 
 	@Override
 	public void setDefaults() {
-		if (ColdStorage.getPlugin().isInitializing()) getChat().sendInfo("Loading default config...");
+		if (Configurations.isInitializing()) getChat().sendInfo("Initializing default config...");
 
 		YamlConfigBackup config = getConfig();
 
@@ -44,9 +45,9 @@ public class MainConfiguration extends Configuration {
 		else
 			config.addDefault("vault", false, new String[] { "Vault is not installed. Vault cannot be set to true." });
 
-		config.saveConfig();
+		config.writeDefaults();
 
-		if (ColdStorage.getPlugin().isInitializing()) getChat().sendInfo("Default config initialized!");
+		if (Configurations.isInitializing()) getChat().sendInfo("Default config initialized!");
 	}
 
 }

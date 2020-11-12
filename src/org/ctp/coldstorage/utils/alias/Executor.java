@@ -20,8 +20,7 @@ public enum Executor {
 				try {
 					PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(p, "/" + command);
 					Bukkit.getPluginManager().callEvent(event);
-					if (!event.isCancelled())
-						Bukkit.dispatchCommand(sender, StringUtils.removeStart(event.getMessage(), "/"));
+					if (!event.isCancelled()) Bukkit.dispatchCommand(sender, StringUtils.removeStart(event.getMessage(), "/"));
 				} catch (Exception e) {
 					/* just for safety */
 					e.printStackTrace();
@@ -33,8 +32,7 @@ public enum Executor {
 	CONSOLE {
 		@Override
 		public void dispatchCommand(CommandSender sender, String command) {
-			if (sender == null || !(sender instanceof ConsoleCommandSender))
-				sender = Bukkit.getConsoleSender();
+			if (sender == null || !(sender instanceof ConsoleCommandSender)) sender = Bukkit.getConsoleSender();
 			ServerCommandEvent event = new ServerCommandEvent(sender, command);
 			Bukkit.getPluginManager().callEvent(event);
 			Bukkit.dispatchCommand(sender, event.getCommand());
@@ -44,7 +42,7 @@ public enum Executor {
 	private static final Map<String, Executor> NAME_MAP = new HashMap<String, Executor>();
 
 	static {
-		for (Executor e : values())
+		for(Executor e: values())
 			NAME_MAP.put(e.name(), e);
 	}
 

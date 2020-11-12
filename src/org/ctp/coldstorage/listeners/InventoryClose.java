@@ -9,7 +9,7 @@ import org.ctp.coldstorage.inventory.Anvilable;
 import org.ctp.coldstorage.inventory.ColdStorageData;
 import org.ctp.crashapi.inventory.InventoryData;
 
-public class InventoryClose implements Listener{
+public class InventoryClose implements Listener {
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
@@ -18,10 +18,10 @@ public class InventoryClose implements Listener{
 		else
 			return;
 		InventoryData csInv = ColdStorage.getPlugin().getInventory(player);
-		
-		if(csInv != null) {
-			if(csInv instanceof Anvilable && ((Anvilable) csInv).willEdit()) return;
-			if(csInv instanceof ColdStorageData && !((ColdStorageData) csInv).isOpening()) ColdStorage.getPlugin().removeInventory(csInv);
+
+		if (csInv != null) {
+			if (csInv instanceof Anvilable && ((Anvilable) csInv).willEdit()) return;
+			if (csInv instanceof ColdStorageData && !((ColdStorageData) csInv).isOpening()) ColdStorage.getPlugin().removeInventory(csInv);
 		}
 	}
 }

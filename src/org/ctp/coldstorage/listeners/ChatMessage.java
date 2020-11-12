@@ -9,7 +9,7 @@ import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.inventory.Anvilable;
 import org.ctp.crashapi.inventory.InventoryData;
 
-public class ChatMessage implements Listener{
+public class ChatMessage implements Listener {
 
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event) {

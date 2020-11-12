@@ -29,7 +29,7 @@ import org.ctp.crashapi.version.Version.VersionType;
 import net.milkbowl.vault.economy.Economy;
 
 public class ColdStorage extends CrashAPIPlugin {
-	
+
 	private static ColdStorage PLUGIN;
 	private static Economy ECON = null;
 	private static Boolean HAS_VAULT = null;
@@ -38,19 +38,18 @@ public class ColdStorage extends CrashAPIPlugin {
 	private PluginVersion pluginVersion;
 	private VersionCheck check;
 	private Configurations config;
-	private boolean initializing = true;
 	private List<InventoryData> inventories = new ArrayList<InventoryData>();
-	
+
 	@Override
 	public void onEnable() {
 		PLUGIN = this;
 		BukkitVersion bukkitVersion = CrashAPI.getPlugin().getBukkitVersion();
 		setPluginVersion(new PluginVersion(this, new Version(getDescription().getVersion(), VersionType.UNKNOWN)));
-		if(!bukkitVersion.isVersionAllowed()) Bukkit.getLogger().log(Level.WARNING, "Bukkit Version " + bukkitVersion.getVersion() + " is not compatible with this plugin. Anvil GUI is not supported.");
-		
+		if (!bukkitVersion.isVersionAllowed()) Bukkit.getLogger().log(Level.WARNING, "Bukkit Version " + bukkitVersion.getVersion() + " is not compatible with this plugin. Anvil GUI is not supported.");
+
 		backup = new CSBackup(PLUGIN);
 		backup.load();
-		
+
 		config = Configurations.getConfigurations();
 		config.onEnable();
 
@@ -66,28 +65,25 @@ public class ColdStorage extends CrashAPIPlugin {
 			} else
 				getChat().sendWarning("Couldn't find command '" + s.getCommand() + ".'");
 		}
-		
+
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new InventoryClick(), this);
 		pm.registerEvents(new InventoryClose(), this);
 		pm.registerEvents(new ChatMessage(), this);
 		pm.registerEvents(new PlayerListener(), this);
 		pm.registerEvents(new BlockListener(), this);
-		
+
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(PLUGIN, new ImportExportThread(), 8l, 8l);
-		
+
 		db = new CSDatabase(PLUGIN);
 		db.load();
 		DatabaseUtils.loadValues();
-		
-		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/ColdStorage/master/VersionHistory", 
-				"https://www.spigotmc.org/resources/cold-storage.59581/", "https://github.com/crashtheparty/ColdStorage", 
-				config.getConfig().getBoolean("get_latest_version"), false);
+
+		check = new VersionCheck(pluginVersion, "https://raw.githubusercontent.com/crashtheparty/ColdStorage/master/VersionHistory", "https://www.spigotmc.org/resources/cold-storage.59581/", "https://github.com/crashtheparty/ColdStorage", config.getConfig().getBoolean("get_latest_version"), false);
 		pm.registerEvents(check, this);
 		checkVersion();
-		setInitializing(false);
 	}
-	
+
 	public static ColdStorage getPlugin() {
 		return PLUGIN;
 	}
@@ -108,38 +104,28 @@ public class ColdStorage extends CrashAPIPlugin {
 	public void setPluginVersion(PluginVersion pluginVersion) {
 		this.pluginVersion = pluginVersion;
 	}
-	
-	private void checkVersion(){
+
+	private void checkVersion() {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, check, 20l, 20 * 60 * 60 * 4l);
-    }
-	
+	}
+
 	public static boolean hasVault() {
-		if(HAS_VAULT == null) {
-			if(!Bukkit.getPluginManager().isPluginEnabled("Vault")) return false;
-			RegisteredServiceProvider<Economy> rsp = Bukkit.getServer()
-					.getServicesManager().getRegistration(Economy.class);
+		if (HAS_VAULT == null) {
+			if (!Bukkit.getPluginManager().isPluginEnabled("Vault")) return false;
+			RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
 			if (rsp == null) return false;
 			ECON = rsp.getProvider();
 			HAS_VAULT = ECON != null;
 		}
 		return HAS_VAULT;
 	}
-	
+
 	public static Economy getEconomy() {
 		return ECON;
 	}
-	
+
 	public Configurations getConfiguration() {
 		return config;
-	}
-
-	@Override
-	public boolean isInitializing() {
-		return initializing;
-	}
-
-	public void setInitializing(boolean initializing) {
-		this.initializing = initializing;
 	}
 
 	@Override

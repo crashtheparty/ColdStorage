@@ -13,7 +13,7 @@ import org.ctp.coldstorage.ColdStorage;
 import org.ctp.coldstorage.inventory.ColdStorageData;
 
 public class AdminList extends ColdStorageData {
-	
+
 	public AdminList(Player player) {
 		super(player);
 	}
@@ -37,19 +37,19 @@ public class AdminList extends ColdStorageData {
 		permissionsMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.adminlist.modify_permissions"));
 		permissions.setItemMeta(permissionsMeta);
 		inv.setItem(10, permissions);
-		
+
 		ItemStack globalPermissions = new ItemStack(Material.NAME_TAG);
 		ItemMeta globalPermissionsMeta = globalPermissions.getItemMeta();
 		globalPermissionsMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.adminlist.modify_global_permissions"));
 		globalPermissions.setItemMeta(globalPermissionsMeta);
 		inv.setItem(12, globalPermissions);
-		
+
 		ItemStack players = new ItemStack(Material.ENDER_CHEST);
 		ItemMeta playersMeta = players.getItemMeta();
 		playersMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.adminlist.modify_players"));
 		players.setItemMeta(playersMeta);
 		inv.setItem(14, players);
-		
+
 		ItemStack storageType = new ItemStack(Material.CHEST);
 		ItemMeta storageTypeMeta = storageType.getItemMeta();
 		storageTypeMeta.setDisplayName(getChat().getMessage(getCodes(), "inventory.adminlist.modify_storage_types"));
@@ -61,7 +61,7 @@ public class AdminList extends ColdStorageData {
 		close(false);
 		ColdStorage.getPlugin().addInventory(new ListPermissions(getPlayer(), getEditing()));
 	}
-	
+
 	public void viewStorageTypeList() {
 		close(false);
 		ColdStorage.getPlugin().addInventory(new EditStorageTypeList(getPlayer(), getEditing()));
