@@ -38,7 +38,11 @@ public class AnvilGUINMS {
 				AnvilGUI_v1_16_R2.createAnvil(player, anvil, choice);
 				break;
 			case 15:
+			case 16:
 				AnvilGUI_v1_16_R3.createAnvil(player, anvil, choice);
+				break;
+			case 17:
+				AnvilGUI_v1_17_R1.createAnvil(player, anvil, choice);
 				break;
 		}
 		else {
