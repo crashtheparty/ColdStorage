@@ -4,30 +4,38 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.ctp.crashapi.inventory.InventoryData;
 import org.ctp.crashapi.nms.anvil.AnvilSlot;
 
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.world.inventory.ContainerAccess;
+import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.level.World;
 
-public class AnvilGUI_v1_15_R1 extends AnvilGUI {
+public class AnvilGUI_v1_18_R1 extends AnvilGUI {
 	private class AnvilContainer extends ContainerAnvil {
-		public AnvilContainer(EntityHuman entity, int windowId) {
-			super(windowId, entity.inventory, at(entity.world, new BlockPosition(0, 0, 0)));
+		public AnvilContainer(EntityHuman entity, int windowId, World world) {
+			super(windowId, entity.fq(), at(world, new BlockPosition(0, 0, 0)));
+			setTitle(new ChatMessage("container.anvil"));
 		}
 
 		@Override
-		public boolean canUse(EntityHuman entityhuman) {
+		public boolean a(EntityHuman entityhuman) {
 			return true;
 		}
 	}
 
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<>();
 
-	public AnvilGUI_v1_15_R1(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
+	public AnvilGUI_v1_18_R1(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
 		super(player, handler, data, choice);
 	}
 
@@ -36,14 +44,16 @@ public class AnvilGUI_v1_15_R1 extends AnvilGUI {
 		items.put(slot, item);
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public void open() {
 		EntityPlayer p = ((CraftPlayer) getPlayer()).getHandle();
 
 		// Counter stuff that the game uses to keep track of inventories
 		int c = p.nextContainerCounter();
+		World w = p.W();
 
-		AnvilContainer container = new AnvilContainer(p, c);
+		AnvilContainer container = new AnvilContainer(p, c, w);
 
 		// Set the items to the items from the inventory given
 		Inventory inv = container.getBukkitView().getTopInventory();
@@ -53,20 +63,19 @@ public class AnvilGUI_v1_15_R1 extends AnvilGUI {
 
 		inv.setItem(0, getItemStack());
 
-		setInventory(inv);
+		setInventory(container.getBukkitView().getTopInventory());
 
 		// Send the packet
-		p.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, container.getType(), new ChatMessage("Repairing")));
-		// Set their active container to the container
-		p.activeContainer = container;
+		p.b.a(new PacketPlayOutOpenWindow(c, container.a(), new ChatMessage("Repairing")));
 
-		// Add the slot listener
-		p.activeContainer.addSlotListener(p);
+		// Set their active container to the container
+		p.a(container);
+		p.bW = container;
 	}
 
 	public static void createAnvil(Player player, InventoryData data, boolean choice) {
 		CSAnvilClickEventHandler handler = CSAnvilClickEventHandler.getHandler(player, data);
-		AnvilGUI_v1_15_R1 gui = new AnvilGUI_v1_15_R1(player, handler, data, choice);
+		AnvilGUI_v1_16_R3 gui = new AnvilGUI_v1_16_R3(player, handler, data, choice);
 		gui.open();
 	}
 

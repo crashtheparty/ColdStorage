@@ -1,7 +1,7 @@
 main: org.ctp.coldstorage.ColdStorage
-version: 2.1.4
+version: 2.1.5
 name: ColdStorage
-api-version: 1.13
+api-version: 1.16
 depend: [CrashAPI]
 commands:
     csopen:

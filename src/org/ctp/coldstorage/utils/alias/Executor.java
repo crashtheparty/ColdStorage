@@ -3,7 +3,6 @@ package org.ctp.coldstorage.utils.alias;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -20,7 +19,8 @@ public enum Executor {
 				try {
 					PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(p, "/" + command);
 					Bukkit.getPluginManager().callEvent(event);
-					if (!event.isCancelled()) Bukkit.dispatchCommand(sender, StringUtils.removeStart(event.getMessage(), "/"));
+					String message = event.getMessage();
+					if (!event.isCancelled()) Bukkit.dispatchCommand(sender, message.charAt(0) == '/' ? message.substring(1) : message);
 				} catch (Exception e) {
 					/* just for safety */
 					e.printStackTrace();
