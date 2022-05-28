@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +23,7 @@ import net.minecraft.world.entity.player.PlayerInventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.level.World;
 
-public class AnvilGUI_v1_17_R1 extends AnvilGUI {
+public class AnvilGUI_1 extends AnvilGUI {
 	private class AnvilContainer extends ContainerAnvil {
 		public AnvilContainer(EntityHuman entity, int windowId, World world)
 		throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
@@ -41,7 +39,7 @@ public class AnvilGUI_v1_17_R1 extends AnvilGUI {
 
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<>();
 
-	public AnvilGUI_v1_17_R1(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
+	public AnvilGUI_1(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
 		super(player, handler, data, choice);
 	}
 
@@ -53,7 +51,7 @@ public class AnvilGUI_v1_17_R1 extends AnvilGUI {
 	@SuppressWarnings("resource")
 	@Override
 	public void open() {
-		EntityPlayer p = ((CraftPlayer) getPlayer()).getHandle();
+		EntityPlayer p = (EntityPlayer) getCraftBukkitEntity(getPlayer());
 
 		// Counter stuff that the game uses to keep track of inventories
 		int c = p.nextContainerCounter();
@@ -74,22 +72,14 @@ public class AnvilGUI_v1_17_R1 extends AnvilGUI {
 		}
 
 		// Set the items to the items from the inventory given
-		Inventory inv = null;
-		CraftInventoryView view = null;
-		try {
-			view = (CraftInventoryView) ContainerAnvil.class.getDeclaredMethod("getBukkitView").invoke(container);
-			inv = view.getTopInventory();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return;
-		}
+		Inventory inv = getInventory(container);
 
 		for(AnvilSlot slot: items.keySet())
 			inv.setItem(slot.getSlot(), items.get(slot));
 
 		inv.setItem(0, getItemStack());
 
-		setInventory(view.getTopInventory());
+		setInventory(inv);
 
 		// Send the packet
 		PlayerConnection b = p.b;
@@ -112,7 +102,7 @@ public class AnvilGUI_v1_17_R1 extends AnvilGUI {
 
 	public static void createAnvil(Player player, InventoryData data, boolean choice) {
 		CSAnvilClickEventHandler handler = CSAnvilClickEventHandler.getHandler(player, data);
-		AnvilGUI_v1_16_R3 gui = new AnvilGUI_v1_16_R3(player, handler, data, choice);
+		AnvilGUI_1 gui = new AnvilGUI_1(player, handler, data, choice);
 		gui.open();
 	}
 

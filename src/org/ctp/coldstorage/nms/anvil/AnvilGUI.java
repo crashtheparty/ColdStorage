@@ -16,10 +16,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.ctp.coldstorage.ColdStorage;
 import org.ctp.crashapi.inventory.InventoryData;
+import org.ctp.crashapi.nms.NMS;
 import org.ctp.crashapi.nms.anvil.AnvilSlot;
 import org.ctp.crashapi.utils.LocationUtils;
 
-public abstract class AnvilGUI {
+public abstract class AnvilGUI extends NMS {
 
 	private Player player;
 

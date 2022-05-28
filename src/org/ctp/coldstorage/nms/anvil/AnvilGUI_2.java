@@ -1,10 +1,10 @@
 package org.ctp.coldstorage.nms.anvil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,17 +13,19 @@ import org.ctp.crashapi.nms.anvil.AnvilSlot;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.inventory.ContainerAccess;
-import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.entity.player.PlayerInventory;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.level.World;
 
-public class AnvilGUI_v1_18_R1 extends AnvilGUI {
+public class AnvilGUI_2 extends AnvilGUI {
 	private class AnvilContainer extends ContainerAnvil {
-		public AnvilContainer(EntityHuman entity, int windowId, World world) {
-			super(windowId, entity.fq(), at(world, new BlockPosition(0, 0, 0)));
+		public AnvilContainer(EntityHuman entity, int windowId, World world) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+			super(windowId, (PlayerInventory) EntityHuman.class.getDeclaredMethod("fq").invoke(entity), at(world, new BlockPosition(0, 0, 0)));
 			setTitle(new ChatMessage("container.anvil"));
 		}
 
@@ -35,7 +37,7 @@ public class AnvilGUI_v1_18_R1 extends AnvilGUI {
 
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<>();
 
-	public AnvilGUI_v1_18_R1(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
+	public AnvilGUI_2(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
 		super(player, handler, data, choice);
 	}
 
@@ -47,16 +49,22 @@ public class AnvilGUI_v1_18_R1 extends AnvilGUI {
 	@SuppressWarnings("resource")
 	@Override
 	public void open() {
-		EntityPlayer p = ((CraftPlayer) getPlayer()).getHandle();
+		EntityPlayer p = (EntityPlayer) getCraftBukkitEntity(getPlayer());
 
 		// Counter stuff that the game uses to keep track of inventories
 		int c = p.nextContainerCounter();
 		World w = p.W();
 
-		AnvilContainer container = new AnvilContainer(p, c, w);
+		AnvilContainer container;
+		try {
+			container = new AnvilContainer(p, c, w);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
 
 		// Set the items to the items from the inventory given
-		Inventory inv = container.getBukkitView().getTopInventory();
+		Inventory inv = getInventory(container);
 
 		for(AnvilSlot slot: items.keySet())
 			inv.setItem(slot.getSlot(), items.get(slot));
@@ -64,18 +72,28 @@ public class AnvilGUI_v1_18_R1 extends AnvilGUI {
 		inv.setItem(0, getItemStack());
 
 		setInventory(container.getBukkitView().getTopInventory());
-
 		// Send the packet
-		p.b.a(new PacketPlayOutOpenWindow(c, container.a(), new ChatMessage("Repairing")));
+		PlayerConnection b = p.b;
+		try {
+			@SuppressWarnings("unchecked")
+			PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(c, (Containers<ContainerAnvil>) (Container.class.getDeclaredMethod("a").invoke(container)), new ChatMessage("Repairing"));
+			b.getClass().getDeclaredMethod("a", Packet.class).invoke(b, packet);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
 		// Set their active container to the container
-		p.a(container);
-		p.bW = container;
+		try {
+			p.getClass().getDeclaredMethod("a", Container.class).invoke(p, container);
+			EntityHuman.class.getDeclaredField("bW").set(p, container);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public static void createAnvil(Player player, InventoryData data, boolean choice) {
 		CSAnvilClickEventHandler handler = CSAnvilClickEventHandler.getHandler(player, data);
-		AnvilGUI_v1_16_R3 gui = new AnvilGUI_v1_16_R3(player, handler, data, choice);
+		AnvilGUI_2 gui = new AnvilGUI_2(player, handler, data, choice);
 		gui.open();
 	}
 
