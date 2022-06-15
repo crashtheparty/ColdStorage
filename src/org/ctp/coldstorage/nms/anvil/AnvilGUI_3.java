@@ -12,8 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.ctp.crashapi.inventory.InventoryData;
 import org.ctp.crashapi.nms.anvil.AnvilSlot;
 
+import net.md_5.bungee.api.chat.TranslatableComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.chat.IChatBaseComponent.ChatSerializer;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
@@ -76,8 +79,9 @@ public class AnvilGUI_3 extends AnvilGUI {
 		// Send the packet
 		PlayerConnection b = p.b;
 		try {
+			TranslatableComponent t = new TranslatableComponent("container.repair");
 			@SuppressWarnings("unchecked")
-			PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(c, (Containers<ContainerAnvil>) (Container.class.getDeclaredMethod("a").invoke(container)), new ChatMessage("Repairing"));
+			PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(c, (Containers<ContainerAnvil>) (Container.class.getDeclaredMethod("a").invoke(container)), ChatSerializer.a(ComponentSerializer.toString(t)));
 			b.getClass().getDeclaredMethod("a", Packet.class).invoke(b, packet);
 		} catch (Exception ex) {
 			ex.printStackTrace();

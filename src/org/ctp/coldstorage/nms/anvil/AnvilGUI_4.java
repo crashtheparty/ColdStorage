@@ -1,5 +1,6 @@
 package org.ctp.coldstorage.nms.anvil;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Optional;
@@ -25,10 +26,10 @@ import net.minecraft.world.entity.player.PlayerInventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.level.World;
 
-public class AnvilGUI_2 extends AnvilGUI {
+public class AnvilGUI_4 extends AnvilGUI {
 	private class AnvilContainer extends ContainerAnvil {
 		public AnvilContainer(EntityHuman entity, int windowId, World world) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-			super(windowId, (PlayerInventory) EntityHuman.class.getDeclaredMethod("fq").invoke(entity), at(world, new BlockPosition(0, 0, 0)));
+			super(windowId, (PlayerInventory) EntityHuman.class.getDeclaredMethod("fr").invoke(entity), at(world, new BlockPosition(0, 0, 0)));
 			setTitle(new ChatMessage("container.anvil"));
 		}
 
@@ -40,7 +41,7 @@ public class AnvilGUI_2 extends AnvilGUI {
 
 	private HashMap<AnvilSlot, ItemStack> items = new HashMap<>();
 
-	public AnvilGUI_2(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
+	public AnvilGUI_4(Player player, final CSAnvilClickEventHandler handler, InventoryData data, boolean choice) {
 		super(player, handler, data, choice);
 	}
 
@@ -74,7 +75,7 @@ public class AnvilGUI_2 extends AnvilGUI {
 
 		inv.setItem(0, getItemStack());
 
-		setInventory(container.getBukkitView().getTopInventory());
+		setInventory(inv);
 		// Send the packet
 		PlayerConnection b = p.b;
 		try {
@@ -89,7 +90,9 @@ public class AnvilGUI_2 extends AnvilGUI {
 		// Set their active container to the container
 		try {
 			p.getClass().getDeclaredMethod("a", Container.class).invoke(p, container);
-			EntityHuman.class.getDeclaredField("bW").set(p, container);
+			Field f = EntityHuman.class.getDeclaredField("bU");
+			f.setAccessible(true);
+			f.set(p, container);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -97,7 +100,7 @@ public class AnvilGUI_2 extends AnvilGUI {
 
 	public static void createAnvil(Player player, InventoryData data, boolean choice) {
 		CSAnvilClickEventHandler handler = CSAnvilClickEventHandler.getHandler(player, data);
-		AnvilGUI_2 gui = new AnvilGUI_2(player, handler, data, choice);
+		AnvilGUI_4 gui = new AnvilGUI_4(player, handler, data, choice);
 		gui.open();
 	}
 

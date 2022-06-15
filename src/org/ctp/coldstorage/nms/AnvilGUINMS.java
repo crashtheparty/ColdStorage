@@ -16,7 +16,8 @@ public class AnvilGUINMS extends NMS {
 				AnvilGUI_v1_16_R3.createAnvil(player, anvil, choice);
 				break;
 			default:
-				if (isSimilarOrAbove(getVersionNumbers(), 1, 18, 2)) AnvilGUI_3.createAnvil(player, anvil, choice);
+				if (isSimilarOrAbove(getVersionNumbers(), 1, 19, 0)) AnvilGUI_4.createAnvil(player, anvil, choice);
+				else if (isSimilarOrAbove(getVersionNumbers(), 1, 18, 2)) AnvilGUI_3.createAnvil(player, anvil, choice);
 				else if (isSimilarOrAbove(getVersionNumbers(), 1, 18, 0)) AnvilGUI_2.createAnvil(player, anvil, choice);
 				else if (isSimilarOrAbove(getVersionNumbers(), 1, 17, 0)) AnvilGUI_1.createAnvil(player, anvil, choice);
 				break;
